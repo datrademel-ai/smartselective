@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Pricing - SmartSelective | VIC Selective Schools Prep</title>
+    <meta name="description" content="$169/month for weekly VIC Selective Schools practice tests. 14-day free trial. All 4 subjects included.">
+    
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        },
+                        secondary: {
+                            50: '#f0fdf4',
+                            500: '#10b981',
+                            600: '#059669',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        html { scroll-behavior: smooth; }
+        .nav-scrolled { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
+        .btn-primary {
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- NAVIGATION -->
+    <nav id="navbar" class="fixed w-full top-0 z-50 bg-white transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-primary-600 to-purple-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">S</span>
+                        </div>
+                        <span class="text-xl font-bold text-gray-900">SmartSelective</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/how-it-works.html" class="text-gray-700 hover:text-primary-600 transition">How It Works</a>
+                    <a href="/sample.html" class="text-gray-700 hover:text-primary-600 transition">Sample Test</a>
+                    <a href="/pricing.html" class="text-primary-600 font-semibold">Pricing</a>
+                    <a href="/about.html" class="text-gray-700 hover:text-primary-600 transition">About</a>
+                    <a href="/contact.html" class="text-gray-700 hover:text-primary-600 transition">Contact</a>
+                </div>
+                
+                <div class="hidden md:block">
+                    <a href="/signup.html" class="btn-primary inline-block bg-primary-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-primary-700">
+                        Start Free Trial
+                    </a>
+                </div>
+                
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-700 hover:text-primary-600 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
+            <div class="px-4 pt-2 pb-4 space-y-2">
+                <a href="/how-it-works.html" class="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded">How It Works</a>
+                <a href="/sample.html" class="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded">Sample Test</a>
+                <a href="/pricing.html" class="block px-3 py-2 text-primary-600 font-semibold hover:bg-gray-50 rounded">Pricing</a>
+                <a href="/about.html" class="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded">About</a>
+                <a href="/contact.html" class="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded">Contact</a>
+                <a href="/signup.html" class="block px-3 py-2 bg-primary-600 text-white rounded font-semibold text-center">Start Free Trial</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="h-16"></div>
+
+    <!-- HERO -->
+    <section class="bg-white py-16 lg:py-20 border-b border-gray-200">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+                Simple, Transparent Pricing
+            </h1>
+            <p class="text-xl text-gray-600">
+                No hidden fees. No lock-in contracts. Cancel anytime.
+            </p>
+        </div>
+    </section>
+
+    <!-- PRICING CARD -->
+    <section class="py-16 lg:py-24">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Main Pricing Card -->
+            <div class="max-w-2xl mx-auto">
+                
+                <!-- Badge -->
+                <div class="text-center mb-6">
+                    <span class="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold text-sm">
+                        🎉 14-Day Free Trial
+                    </span>
+                </div>
+                
+                <!-- Card -->
+                <div class="bg-white rounded-2xl shadow-xl border-2 border-primary-200 p-8 lg:p-12">
+                    
+                    <h2 class="text-3xl font-bold text-gray-900 text-center mb-6">
+                        SmartSelective VIC
+                    </h2>
+                    
+                    <!-- Price Display -->
+                    <div class="text-center mb-8">
+                        <div class="mb-4">
+                            <span class="text-5xl font-bold text-gray-900">$0</span>
+                            <span class="text-xl text-gray-600 ml-2">for first 14 days</span>
+                        </div>
+                        <div class="text-2xl text-gray-700">
+                            Then <span class="font-bold text-primary-600">$169</span>/month
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">GST included • Cancel anytime</p>
+                    </div>
+                    
+                    <!-- What's Included -->
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-gray-700">Weekly 4-subject practice tests (every Monday)</span>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-gray-700">All subjects: Numerical, Reading, Mathematics, Verbal Reasoning</span>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-gray-700">Complete answer keys with detailed explanations</span>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-gray-700">Downloadable PDF format - print or complete digitally</span>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-gray-700">Unlimited access to all past tests</span>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-gray-700">Email delivery every Monday at 6am</span>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-gray-700">Priority email support (&lt; 24hr response)</span>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-gray-700">Cancel anytime - no fees, no questions asked</span>
+                        </div>
+                    </div>
+                    
+                    <!-- CTA Button -->
+                    <a href="/signup.html" class="block w-full btn-primary bg-primary-600 text-white text-center px-8 py-4 rounded-lg font-bold text-lg hover:bg-primary-700 shadow-lg">
+                        Start Your 14-Day Free Trial
+                    </a>
+                    
+                    <p class="text-center text-sm text-gray-500 mt-4">
+                        No charge for 14 days • Credit card required • Cancel anytime
+                    </p>
+                    
+                </div>
+            </div>
+            
+            <!-- Annual Option -->
+            <div class="max-w-2xl mx-auto mt-8">
+                <div class="bg-gradient-to-r from-purple-50 to-primary-50 rounded-xl p-8 border border-primary-200">
+                    <div class="flex items-center justify-between flex-wrap gap-4">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                    Save $338
+                                </span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-1">Annual Plan</h3>
+                            <p class="text-gray-600">$1,690/year - That's just $140.83/month</p>
+                            <p class="text-sm text-gray-500 mt-1">17% cheaper than monthly billing</p>
+                        </div>
+                        <a href="/signup.html?plan=annual" class="btn-primary bg-purple-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-purple-700 whitespace-nowrap">
+                            Choose Annual
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- WHAT YOU GET -->
+    <section class="bg-gray-50 py-16 lg:py-24">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center mb-12">
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                    What You Actually Get
+                </h2>
+                <p class="text-xl text-gray-600">
+                    From March to June 2026, here's your complete preparation package
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <div class="text-4xl mb-4">📅</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">
+                        16 Complete Mock Tests
+                    </h3>
+                    <p class="text-gray-600">
+                        One every Monday from March to June. That's 16 full exam simulations before the real test.
+                    </p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <div class="text-4xl mb-4">⏱️</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">
+                        32+ Hours of Practice
+                    </h3>
+                    <p class="text-gray-600">
+                        Each test is 2 hours. Total practice time exceeds most tutoring programs.
+                    </p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <div class="text-4xl mb-4">❓</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">
+                        1,400+ Unique Questions
+                    </h3>
+                    <p class="text-gray-600">
+                        Approximately 85-90 questions per test across 4 subjects. Never repeated content.
+                    </p>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="py-16 lg:py-24">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center mb-12">
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                    Pricing Questions
+                </h2>
+            </div>
+            
+            <div class="space-y-4">
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center hover:bg-gray-50">
+                        <span class="font-semibold text-gray-900">When will I be charged?</span>
+                        <svg class="faq-icon w-5 h-5 text-gray-500 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-5">
+                        <p class="text-gray-600">
+                            Your credit card is required at signup but won't be charged for 14 days. Your first charge of $169 will occur on Day 15, then monthly on the same date thereafter.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center hover:bg-gray-50">
+                        <span class="font-semibold text-gray-900">Can I cancel during the free trial?</span>
+                        <svg class="faq-icon w-5 h-5 text-gray-500 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-5">
+                        <p class="text-gray-600">
+                            Absolutely! Cancel anytime during your 14-day trial and you won't be charged a single cent.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center hover:bg-gray-50">
+                        <span class="font-semibold text-gray-900">Are there any hidden fees?</span>
+                        <svg class="faq-icon w-5 h-5 text-gray-500 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-5">
+                        <p class="text-gray-600">
+                            None. $169/month (GST included) is all you pay. No setup fees, no cancellation fees, no surprise charges.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center hover:bg-gray-50">
+                        <span class="font-semibold text-gray-900">Can I switch from monthly to annual?</span>
+                        <svg class="faq-icon w-5 h-5 text-gray-500 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-5">
+                        <p class="text-gray-600">
+                            Yes! Contact us anytime at support@smartselective.com.au to switch. We'll credit your remaining monthly balance toward the annual plan.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center hover:bg-gray-50">
+                        <span class="font-semibold text-gray-900">What payment methods do you accept?</span>
+                        <svg class="faq-icon w-5 h-5 text-gray-500 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-5">
+                        <p class="text-gray-600">
+                            We accept all major credit cards (Visa, Mastercard, Amex) and debit cards through our secure payment processor, Stripe.
+                        </p>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="text-center mt-8">
+                <a href="/faq.html" class="text-primary-600 hover:text-primary-700 font-semibold">
+                    See All FAQs →
+                </a>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- GUARANTEE -->
+    <section class="bg-green-50 py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="inline-block bg-green-500 text-white rounded-full p-4 mb-6">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">
+                Risk-Free Trial
+            </h2>
+            <p class="text-lg text-gray-700 max-w-2xl mx-auto">
+                Try SmartSelective completely free for 14 days. Cancel anytime during the trial period and you won't be charged. We're confident your child will benefit from consistent, high-quality practice.
+            </p>
+        </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="bg-gradient-to-br from-primary-600 to-purple-700 text-white py-16 lg:py-20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            
+            <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+                Ready to Get Started?
+            </h2>
+            
+            <p class="text-xl text-primary-100 mb-10">
+                Join families preparing smarter for June 2026
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/signup.html" class="btn-primary inline-block bg-white text-primary-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-50 shadow-lg">
+                    Start 14-Day Free Trial
+                </a>
+                <a href="/sample.html" class="inline-block bg-primary-700 bg-opacity-50 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-opacity-70 border-2 border-white border-opacity-30">
+                    Download Free Sample
+                </a>
+            </div>
+            
+            <p class="text-sm text-primary-100 mt-6">
+                Questions? Email hello@smartselective.com.au
+            </p>
+            
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 text-gray-300 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-primary-600 to-purple-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">S</span>
+                        </div>
+                        <span class="text-xl font-bold text-white">SmartSelective</span>
+                    </div>
+                    <p class="text-sm mb-4">Smart preparation for VIC Selective Schools</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Product</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/how-it-works.html" class="hover:text-primary-500">How It Works</a></li>
+                        <li><a href="/sample.html" class="hover:text-primary-500">Free Sample</a></li>
+                        <li><a href="/pricing.html" class="hover:text-primary-500">Pricing</a></li>
+                        <li><a href="/faq.html" class="hover:text-primary-500">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Company</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/about.html" class="hover:text-primary-500">About Us</a></li>
+                        <li><a href="/contact.html" class="hover:text-primary-500">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Legal</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/terms.html" class="hover:text-primary-500">Terms of Service</a></li>
+                        <li><a href="/privacy.html" class="hover:text-primary-500">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 text-center text-sm">
+                <p class="mb-2">© 2026 SmartSelective. All rights reserved.</p>
+                <p class="text-gray-500">Preparing students for Melbourne High, Mac.Robertson, Nossal, and Suzanne Cory since 2026.</p>
+            </div>
+            
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+        
+        // Navbar scroll
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 10) {
+                navbar.classList.add('nav-scrolled');
+            } else {
+                navbar.classList.remove('nav-scrolled');
+            }
+        });
+        
+        // FAQ Accordion
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                const icon = question.querySelector('.faq-icon');
+                
+                answer.classList.toggle('hidden');
+                icon.style.transform = answer.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+            });
+        });
+    </script>
+
+</body>
+</html>
