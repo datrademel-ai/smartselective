@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How It Works - SmartSelective</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        nav {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: #333;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: #2563eb;
+        }
+        
+        .btn {
+            background: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #1d4ed8;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .section {
+            padding: 4rem 0;
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .step {
+            text-align: center;
+            padding: 2rem;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background: #2563eb;
+            color: white;
+            border-radius: 50%;
+            line-height: 50px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        footer {
+            background: #1f2937;
+            color: white;
+            padding: 3rem 0;
+        }
+        
+        footer .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+        
+        footer h4 {
+            margin-bottom: 1rem;
+        }
+        
+        footer a {
+            color: #d1d5db;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        footer a:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">SmartSelective</a>
+            <ul>
+                <li><a href="/how-it-works.html">How It Works</a></li>
+                <li><a href="/subjects.html">Subject Guide</a></li>
+                <li><a href="/pricing.html">Pricing</a></li>
+                <li><a href="/about.html">About</a></li>
+                <li><a href="/contact.html">Contact</a></li>
+                <li><a href="/signup.html" class="btn">Start Now</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1>How SmartSelective Works</h1>
+            <p>Simple, consistent preparation that builds confidence</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <h2 style="text-align: center; font-size: 2rem; margin-bottom: 3rem;">Get Started in 4 Easy Steps</h2>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Sign Up & Pay</h3>
+                    <p>Subscribe in 60 seconds. Billing starts immediately. Get instant access to your welcome bonus test.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Get Bonus Test</h3>
+                    <p>Receive your welcome bonus test immediately via email. Start practicing right away with all 4 subjects!</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Weekly Delivery</h3>
+                    <p>Every Monday at 4am, get a fresh 4-subject practice test via email. Never repeat, always challenging.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Build Confidence</h3>
+                    <p>By June exam day, your child will have completed 17+ full mock tests and be fully prepared.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" style="background: #f9fafb;">
+        <div class="container" style="max-width: 800px;">
+            <h2 style="text-align: center; margin-bottom: 2rem;">What You Get Each Week</h2>
+            
+            <div style="background: white; padding: 2rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <h3 style="color: #2563eb; margin-bottom: 1rem;">📧 Monday Morning Delivery</h3>
+                <p>Tests arrive at 4am every Monday, giving you the full week to complete them at your own pace.</p>
+            </div>
+            
+            <div style="background: white; padding: 2rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <h3 style="color: #2563eb; margin-bottom: 1rem;">📝 4 Complete Subjects</h3>
+                <p>Each test includes Numerical Reasoning, Reading Comprehension, Mathematics, and Verbal Reasoning - exactly like the real exam.</p>
+            </div>
+            
+            <div style="background: white; padding: 2rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <h3 style="color: #2563eb; margin-bottom: 1rem;">✅ Answer Keys & Explanations</h3>
+                <p>Complete solutions with detailed explanations help your child learn from every question.</p>
+            </div>
+            
+            <div style="background: white; padding: 2rem; border-radius: 8px;">
+                <h3 style="color: #2563eb; margin-bottom: 1rem;">📊 Progress Tracking</h3>
+                <p>Watch improvement week by week. Identify strengths and areas needing more focus.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container" style="text-align: center;">
+            <h2 style="margin-bottom: 2rem;">Ready to Get Started?</h2>
+            <p style="font-size: 1.125rem; margin-bottom: 2rem;">Join 120+ families preparing for the June 2026 exam</p>
+            <a href="/signup.html" class="btn" style="font-size: 1.125rem; padding: 1rem 2rem;">Start Now - $99/month</a>
+            <p style="margin-top: 1rem; color: #6b7280;">1st week test + 1 bonus set free • No contract • Cancel anytime</p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div>
+                <h4>Product</h4>
+                <a href="/how-it-works.html">How It Works</a>
+                <a href="/subjects.html">Subject Guide</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/faq.html">FAQ</a>
+            </div>
+            <div>
+                <h4>Company</h4>
+                <a href="/about.html">About Us</a>
+                <a href="/contact.html">Contact</a>
+            </div>
+            <div>
+                <h4>Legal</h4>
+                <a href="/terms.html">Terms of Service</a>
+                <a href="/privacy.html">Privacy Policy</a>
+            </div>
+        </div>
+        <div class="container" style="margin-top: 2rem; text-align: center; border-top: 1px solid #374151; padding-top: 2rem;">
+            <p>© 2026 SmartSelective. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
