@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - SmartSelective</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        nav {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: #333;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: #2563eb;
+        }
+        
+        .btn {
+            background: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #1d4ed8;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .section {
+            padding: 4rem 0;
+        }
+        
+        .pricing-card {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border: 2px solid #2563eb;
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+        }
+        
+        .price-tag {
+            background: #eff6ff;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+        
+        .price {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #2563eb;
+            margin: 0.5rem 0;
+        }
+        
+        .price-period {
+            font-size: 1.25rem;
+            color: #6b7280;
+        }
+        
+        .price-note {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+        
+        .features {
+            text-align: left;
+            margin: 2rem 0;
+        }
+        
+        .feature-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+        
+        .checkmark {
+            color: #10b981;
+            margin-right: 0.75rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .policy-box {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+        
+        .policy-box h3 {
+            color: #d97706;
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+        }
+        
+        .policy-box ul {
+            list-style: none;
+            margin-left: 0;
+        }
+        
+        .policy-box li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .policy-box li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #d97706;
+            font-weight: bold;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .info-card h3 {
+            color: #2563eb;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+        
+        .info-card ul {
+            list-style: none;
+        }
+        
+        .info-card li {
+            padding: 0.5rem 0;
+            color: #4b5563;
+        }
+        
+        footer {
+            background: #1f2937;
+            color: white;
+            padding: 3rem 0;
+        }
+        
+        footer .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+        
+        footer h4 {
+            margin-bottom: 1rem;
+        }
+        
+        footer a {
+            color: #d1d5db;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        footer a:hover {
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                gap: 1rem;
+                font-size: 0.875rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .price {
+                font-size: 2.5rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">SmartSelective</a>
+            <ul>
+                <li><a href="/how-it-works.html">How It Works</a></li>
+                <li><a href="/subjects.html">Subject Guide</a></li>
+                <li><a href="/pricing.html">Pricing</a></li>
+                <li><a href="/about.html">About</a></li>
+                <li><a href="/contact.html">Contact</a></li>
+                <li><a href="/signup.html" class="btn">Start Now</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Simple, Transparent Pricing</h1>
+            <p>Online practice platform • Fresh tests weekly • No lock-in contracts</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="pricing-card">
+                <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">SmartSelective Monthly</h2>
+                <p style="color: #6b7280; margin-bottom: 1rem;">Complete VIC Selective Schools preparation platform</p>
+                
+                <div class="price-tag">
+                    <div>
+                        <span style="font-size: 1.125rem; color: #6b7280;">First Month</span>
+                        <div class="price">$79</div>
+                        <div class="price-note">Get started with special introductory pricing</div>
+                    </div>
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #d1d5db;">
+                        <span style="font-size: 1.125rem; color: #6b7280;">From 2nd Month Onwards</span>
+                        <div class="price">$99<span class="price-period">/month</span></div>
+                    </div>
+                </div>
+                
+                <div class="features">
+                    <h3 style="margin-bottom: 1rem; font-size: 1.25rem;">What's Included:</h3>
+                    <div class="feature-item">
+                        <span class="checkmark">✓</span>
+                        <span><strong>All 4 Subjects:</strong> Reading, Mathematics, Verbal Reasoning, Quantitative Reasoning</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="checkmark">✓</span>
+                        <span><strong>Weekly Fresh Tests:</strong> New practice tests every Monday</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="checkmark">✓</span>
+                        <span><strong>Timed Practice:</strong> Real exam conditions with automatic timers</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="checkmark">✓</span>
+                        <span><strong>Instant Results:</strong> Scores and detailed explanations after submission</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="checkmark">✓</span>
+                        <span><strong>Performance Tracking:</strong> Progress graphs and analytics</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="checkmark">✓</span>
+                        <span><strong>Multi-Device Access:</strong> Desktop, mobile, and tablet support</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="checkmark">✓</span>
+                        <span><strong>No Printing Required:</strong> Complete everything online</span>
+                    </div>
+                </div>
+                
+                <div class="policy-box">
+                    <h3>⚠️ Important Subscription Terms</h3>
+                    <ul>
+                        <li><strong>No Lock-in Contract:</strong> Cancel anytime, no questions asked</li>
+                        <li><strong>Auto-Renewal:</strong> Optional - you choose during signup</li>
+                        <li><strong>Refund Policy:</strong> 50% cancellation fee applies after completing your first test (prevents free trial abuse)</li>
+                        <li><strong>Weekly Cycle:</strong> Tests available Tuesday-Sunday, new tests every Monday</li>
+                        <li><strong>One-Time Attempts:</strong> Each test can only be taken once (real exam practice)</li>
+                    </ul>
+                </div>
+                
+                <a href="/signup.html" class="btn" style="width: 100%; margin-top: 2rem; padding: 1rem; font-size: 1.125rem;">Start Your First Month - $79</a>
+                <p style="margin-top: 1rem; color: #6b7280; font-size: 0.875rem;">Launching March 2, 2026 • Join the waitlist now</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" style="background: #f9fafb;">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 3rem; font-size: 2rem;">Test Format & Timing</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>📖 Reading</h3>
+                    <ul>
+                        <li><strong>Questions:</strong> 35-40 items</li>
+                        <li><strong>Time:</strong> 35 minutes</li>
+                        <li><strong>Per Question:</strong> ~50-60 seconds</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>🔢 Mathematics</h3>
+                    <ul>
+                        <li><strong>Questions:</strong> 35-40 items</li>
+                        <li><strong>Time:</strong> 30 minutes</li>
+                        <li><strong>Per Question:</strong> ~45-50 seconds</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>💬 Verbal Reasoning</h3>
+                    <ul>
+                        <li><strong>Questions:</strong> 40-50 items</li>
+                        <li><strong>Time:</strong> 30 minutes</li>
+                        <li><strong>Per Question:</strong> ~35-45 seconds</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>🧮 Quantitative Reasoning</h3>
+                    <ul>
+                        <li><strong>Questions:</strong> 35-40 items</li>
+                        <li><strong>Time:</strong> 30 minutes</li>
+                        <li><strong>Per Question:</strong> ~45-50 seconds</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container" style="max-width: 900px;">
+            <h2 style="text-align: center; margin-bottom: 2rem; font-size: 2rem;">How It Works</h2>
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="display: grid; gap: 1.5rem;">
+                    <div style="display: flex; gap: 1rem;">
+                        <div style="flex-shrink: 0; width: 40px; height: 40px; background: #2563eb; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">1</div>
+                        <div>
+                            <h3 style="color: #2563eb; margin-bottom: 0.5rem;">Sign Up & Subscribe</h3>
+                            <p style="color: #6b7280;">Create your account and choose your subscription plan. First month only $79!</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <div style="flex-shrink: 0; width: 40px; height: 40px; background: #2563eb; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">2</div>
+                        <div>
+                            <h3 style="color: #2563eb; margin-bottom: 0.5rem;">Access Weekly Tests</h3>
+                            <p style="color: #6b7280;">Every Monday, new tests become available. Practice Tuesday through Sunday at your convenience.</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <div style="flex-shrink: 0; width: 40px; height: 40px; background: #2563eb; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">3</div>
+                        <div>
+                            <h3 style="color: #2563eb; margin-bottom: 0.5rem;">Take Timed Tests</h3>
+                            <p style="color: #6b7280;">Start the test when ready. Timer starts automatically. Test auto-submits when time expires.</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <div style="flex-shrink: 0; width: 40px; height: 40px; background: #2563eb; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">4</div>
+                        <div>
+                            <h3 style="color: #2563eb; margin-bottom: 0.5rem;">Review & Improve</h3>
+                            <p style="color: #6b7280;">Get instant results with detailed explanations. Track your progress over time.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" style="background: #eff6ff;">
+        <div class="container" style="text-align: center;">
+            <h2 style="margin-bottom: 1rem; font-size: 2rem;">Ready to Start Preparing?</h2>
+            <p style="font-size: 1.125rem; margin-bottom: 2rem; color: #6b7280;">Join families preparing for the VIC Selective Schools exam</p>
+            <a href="/signup.html" class="btn" style="font-size: 1.125rem; padding: 1rem 2rem;">Join Waitlist - Launching March 2, 2026</a>
+            <p style="margin-top: 1.5rem; color: #6b7280;">First month $79 • Then $99/month • No lock-in • Cancel anytime</p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div>
+                <h4>Product</h4>
+                <a href="/how-it-works.html">How It Works</a>
+                <a href="/subjects.html">Subject Guide</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/faq.html">FAQ</a>
+            </div>
+            <div>
+                <h4>Company</h4>
+                <a href="/about.html">About Us</a>
+                <a href="/contact.html">Contact</a>
+            </div>
+            <div>
+                <h4>Legal</h4>
+                <a href="/terms.html">Terms of Service</a>
+                <a href="/privacy.html">Privacy Policy</a>
+            </div>
+        </div>
+        <div class="container" style="margin-top: 2rem; text-align: center; border-top: 1px solid #374151; padding-top: 2rem;">
+            <p>© 2026 SmartSelective. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
