@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - SmartSelective</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f9fafb;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        nav {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: #333;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: #2563eb;
+        }
+        
+        .btn {
+            background: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #1d4ed8;
+        }
+        
+        .signup-section {
+            padding: 4rem 0;
+            min-height: calc(100vh - 300px);
+        }
+        
+        .signup-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 3rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .signup-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .signup-header h1 {
+            font-size: 2rem;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+        
+        .signup-header p {
+            color: #6b7280;
+        }
+        
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 0.875rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            color: #333;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .social-btn:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 2rem 0;
+            color: #6b7280;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .divider span {
+            padding: 0 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        .required {
+            color: #ef4444;
+            margin-left: 0.25rem;
+        }
+        
+        .optional {
+            color: #9ca3af;
+            font-size: 0.875rem;
+            font-weight: 400;
+            margin-left: 0.5rem;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .checkbox-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 0.75rem;
+            margin-top: 0.125rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .checkbox-item label {
+            cursor: pointer;
+            color: #4b5563;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        .checkbox-item label a {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background: #1d4ed8;
+        }
+        
+        .submit-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .login-link a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+            color: #1e40af;
+        }
+        
+        .info-box strong {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .error-message {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c00;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .success-message {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #060;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        footer {
+            background: #1f2937;
+            color: white;
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+        
+        footer .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+        
+        footer h4 {
+            margin-bottom: 1rem;
+        }
+        
+        footer a {
+            color: #d1d5db;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        footer a:hover {
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+            }
+            
+            .signup-container {
+                padding: 2rem 1.5rem;
+            }
+            
+            .signup-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">SmartSelective</a>
+            <ul>
+                <li><a href="/how-it-works.html">How It Works</a></li>
+                <li><a href="/subjects.html">Subject Guide</a></li>
+                <li><a href="/pricing.html">Pricing</a></li>
+                <li><a href="/about.html">About</a></li>
+                <li><a href="/contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="signup-section">
+        <div class="container">
+            <div class="signup-container">
+                <div class="signup-header">
+                    <h1>Create Your Account</h1>
+                    <p>Start preparing for VIC Selective Schools exam</p>
+                </div>
+
+                <div class="info-box">
+                    <strong>🎉 Special Launch Offer!</strong>
+                    First month only $79 • Launching March 2, 2026
+                </div>
+
+                <div id="errorMessage" class="error-message"></div>
+                <div id="successMessage" class="success-message"></div>
+
+                <!-- Social Login Options -->
+                <div class="social-login">
+                    <button class="social-btn" id="googleSignIn">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18.1713 8.36788H17.5001V8.33329H10.0001V11.6666H14.7096C14.0225 13.607 12.1763 15 10.0001 15C7.23884 15 5.00008 12.7612 5.00008 9.99996C5.00008 7.23871 7.23884 4.99996 10.0001 4.99996C11.2746 4.99996 12.4342 5.48079 13.3171 6.26621L15.6742 3.90913C14.1859 2.52204 12.1951 1.66663 10.0001 1.66663C5.39801 1.66663 1.66675 5.39788 1.66675 9.99996C1.66675 14.602 5.39801 18.3333 10.0001 18.3333C14.6022 18.3333 18.3334 14.602 18.3334 9.99996C18.3334 9.44121 18.2759 8.89579 18.1713 8.36788Z" fill="#FFC107"/>
+                            <path d="M2.62756 6.12121L5.36548 8.12954C6.10631 6.29537 7.90048 5.00004 10.0005 5.00004C11.2751 5.00004 12.4346 5.48087 13.3176 6.26629L15.6746 3.90921C14.1863 2.52212 12.1955 1.66671 10.0005 1.66671C6.79923 1.66671 4.02339 3.47371 2.62756 6.12121Z" fill="#FF3D00"/>
+                            <path d="M10.0001 18.3333C12.1526 18.3333 14.1092 17.5096 15.5876 16.17L13.0084 13.9875C12.1434 14.6108 11.0951 15 10.0001 15C7.83258 15 5.99175 13.6179 5.29842 11.6892L2.58008 13.7829C3.96091 16.4817 6.76091 18.3333 10.0001 18.3333Z" fill="#4CAF50"/>
+                            <path d="M18.1713 8.36796H17.5V8.33337H10V11.6667H14.7095C14.3825 12.5903 13.7787 13.3972 13.007 13.9879L13.0083 13.9871L15.5875 16.1696C15.4079 16.3321 18.3333 14.1667 18.3333 10C18.3333 9.44129 18.2758 8.89587 18.1713 8.36796Z" fill="#1976D2"/>
+                        </svg>
+                        Continue with Google
+                    </button>
+                    
+                    <button class="social-btn" id="appleSignIn">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.0582 15.7137C16.6832 16.5512 16.2457 17.3262 15.7415 18.0428C15.0707 19.0012 14.5207 19.6762 14.0957 20.0678C13.4332 20.6987 12.7249 21.0212 11.9665 21.0487C11.4207 21.0487 10.7624 20.8928 10.0165 20.5762C9.26237 20.2628 8.57904 20.1069 7.95821 20.1069C7.30821 20.1069 6.60404 20.2628 5.84571 20.5762C5.08321 20.8928 4.45404 21.0578 3.94571 21.0837C3.21654 21.1345 2.49571 20.8028 1.77904 20.0678C1.32071 19.6478 0.745706 18.9512 0.0540388 17.9762C-0.691127 16.9345 -1.29946 15.7212 -1.77946 14.3278C-2.29529 12.8012 -2.55612 11.3303 -2.55612 9.91453C-2.55612 8.2887 -2.18779 6.87954 -1.45696 5.69286C-0.882124 4.7262 -0.118291 3.96453 0.845709 3.41453C1.80971 2.86453 2.84654 2.58286 3.96237 2.55536C4.53737 2.55536 5.30404 2.73203 6.26821 3.07786C7.22654 3.42536 7.85237 3.60203 8.13987 3.60203C8.35821 3.60203 9.05404 3.39536 10.2124 2.98536C11.3082 2.60453 12.2374 2.44703 12.9999 2.50203C15.0957 2.64036 16.6832 3.46453 17.7499 4.98203C15.9124 6.09453 15.004 7.6262 15.0249 9.56453C15.0457 11.0395 15.6082 12.2762 16.7082 13.2653C17.2082 13.727 17.7665 14.0795 18.3957 14.327C18.2749 14.6595 18.1499 14.9795 18.0165 15.2895C17.0915 15.1295 17.0857 15.1295 17.0582 15.7137ZM13.1124 -1.58797C13.1124 -0.488469 12.6832 0.532281 11.829 1.47394C10.804 2.59478 9.56654 3.23561 8.23237 3.12228C8.21237 2.99311 8.20071 2.85811 8.20071 2.71728C8.20071 1.66478 8.68404 0.539781 9.55404 -0.377969C9.98821 -0.843469 10.5332 -1.22847 11.1874 -1.53347C11.8374 -1.83347 12.4707 -2.00597 13.0832 -2.04347C13.104 -1.89347 13.1124 -1.74347 13.1124 -1.58847V-1.58797Z" fill="black"/>
+                        </svg>
+                        Continue with Apple
+                    </button>
+                </div>
+
+                <div class="divider">
+                    <span>or sign up with email</span>
+                </div>
+
+                <!-- Email/Password Signup Form -->
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label for="email">Email Address<span class="required">*</span></label>
+                        <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password<span class="required">*</span></label>
+                        <input type="password" id="password" name="password" required placeholder="Minimum 8 characters" minlength="8">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password<span class="required">*</span></label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Re-enter your password">
+                    </div>
+
+                    <div class="divider">
+                        <span>Optional Information</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="studentName">Student Name<span class="optional">(Optional)</span></label>
+                        <input type="text" id="studentName" name="studentName" placeholder="Enter student's name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="preferredSchool">Preferred Selective School<span class="optional">(Optional)</span></label>
+                        <select id="preferredSchool" name="preferredSchool">
+                            <option value="">-- Select a school --</option>
+                            <option value="melbourne-high">Melbourne High School (Boys) - South Yarra</option>
+                            <option value="macrobertson">Mac.Robertson Girls' High School (Girls) - Melbourne</option>
+                            <option value="nossal">Nossal High School (Co-ed) - Berwick</option>
+                            <option value="suzanne-cory">Suzanne Cory High School (Co-ed) - Werribee</option>
+                            <option value="undecided">Not Sure Yet / Undecided</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contactNumber">Contact Number<span class="optional">(Optional)</span></label>
+                        <input type="tel" id="contactNumber" name="contactNumber" placeholder="e.g., 0412 345 678">
+                    </div>
+
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="consentData" name="consentData" required>
+                            <label for="consentData">
+                                <span class="required">*</span> I agree to the collection and use of my email address and personal information as described in the <a href="/privacy.html" target="_blank">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="consentMarketing" name="consentMarketing">
+                            <label for="consentMarketing">
+                                I would like to receive practice test updates, tips, and promotional emails from SmartSelective (you can unsubscribe anytime)
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">Create Account</button>
+                </form>
+
+                <div class="login-link">
+                    Already have an account? <a href="/login.html">Log In</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div>
+                <h4>Product</h4>
+                <a href="/how-it-works.html">How It Works</a>
+                <a href="/subjects.html">Subject Guide</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/faq.html">FAQ</a>
+            </div>
+            <div>
+                <h4>Company</h4>
+                <a href="/about.html">About Us</a>
+                <a href="/contact.html">Contact</a>
+            </div>
+            <div>
+                <h4>Legal</h4>
+                <a href="/terms.html">Terms of Service</a>
+                <a href="/privacy.html">Privacy Policy</a>
+            </div>
+        </div>
+        <div class="container" style="margin-top: 2rem; text-align: center; border-top: 1px solid #374151; padding-top: 2rem;">
+            <p>© 2026 SmartSelective. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Initialize Supabase - ONLY ONCE!
+        const SUPABASE_URL = 'https://qsowtakfotypsrkfanlw.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_Byg3zUaOAzzxVuyPEhY8GQ_3GG0ldrj';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+        
+        function setLoading(isLoading) {
+            const form = document.getElementById('signupForm');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (isLoading) {
+                form.classList.add('loading');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Creating Account...';
+            } else {
+                form.classList.remove('loading');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
+            }
+        }
+        
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const consentData = document.getElementById('consentData').checked;
+            
+            if (password !== confirmPassword) {
+                showError('Passwords do not match. Please try again.');
+                return;
+            }
+            
+            if (!consentData) {
+                showError('You must agree to the Privacy Policy to create an account.');
+                return;
+            }
+            
+            if (password.length < 8) {
+                showError('Password must be at least 8 characters long.');
+                return;
+            }
+            
+            setLoading(true);
+            
+            try {
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                });
+                
+                if (authError) throw authError;
+                
+                const studentName = document.getElementById('studentName').value || null;
+                const preferredSchool = document.getElementById('preferredSchool').value || null;
+                const contactNumber = document.getElementById('contactNumber').value || null;
+                const consentMarketing = document.getElementById('consentMarketing').checked;
+                
+                const { error: profileError } = await supabase
+                    .from('users')
+                    .update({
+                        student_name: studentName,
+                        preferred_school: preferredSchool,
+                        contact_number: contactNumber,
+                        consent_data: consentData,
+                        consent_marketing: consentMarketing,
+                        auth_provider: 'email'
+                    })
+                    .eq('id', authData.user.id);
+                
+                if (profileError) {
+                    console.error('Profile update error:', profileError);
+                }
+                
+                showSuccess('Account created successfully! Please check your email to verify your account.');
+                document.getElementById('signupForm').reset();
+                
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Signup error:', error);
+                showError(error.message || 'An error occurred during sign up. Please try again.');
+            } finally {
+                setLoading(false);
+            }
+        });
+        
+        document.getElementById('googleSignIn').addEventListener('click', async function() {
+            try {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin + '/dashboard.html'
+                    }
+                });
+                
+                if (error) throw error;
+            } catch (error) {
+                console.error('Google sign-in error:', error);
+                showError('Google sign-in is not yet configured. Please use email sign-up.');
+            }
+        });
+        
+        document.getElementById('appleSignIn').addEventListener('click', async function() {
+            try {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'apple',
+                    options: {
+                        redirectTo: window.location.origin + '/dashboard.html'
+                    }
+                });
+                
+                if (error) throw error;
+            } catch (error) {
+                console.error('Apple sign-in error:', error);
+                showError('Apple sign-in is not yet configured. Please use email sign-up.');
+            }
+        });
+    </script>
+</body>
+</html>
