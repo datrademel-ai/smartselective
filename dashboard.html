@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SmartSelective</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f9fafb; color: #333; }
+
+        .header { background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 1rem 0; position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #2563eb; text-decoration: none; }
+        .user-info { display: flex; align-items: center; gap: 1rem; }
+        .user-email { color: #6b7280; font-size: 0.875rem; }
+        .logout-btn { background: #ef4444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; }
+        .logout-btn:hover { background: #dc2626; }
+
+        .main-container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; display: grid; grid-template-columns: 250px 1fr; gap: 2rem; }
+
+        .sidebar { background: white; border-radius: 12px; padding: 1.5rem; height: fit-content; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .sidebar h3 { color: #2563eb; margin-bottom: 1rem; }
+        .sidebar nav { display: flex; flex-direction: column; gap: 0.5rem; }
+        .sidebar a { padding: 0.75rem; color: #4b5563; text-decoration: none; border-radius: 6px; }
+        .sidebar a:hover { background: #eff6ff; color: #2563eb; }
+        .sidebar a.active { background: #2563eb; color: white; }
+
+        .content { display: flex; flex-direction: column; gap: 2rem; }
+
+        .welcome-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 12px; }
+        .welcome-card h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .welcome-card p { opacity: 0.9; font-size: 1.125rem; }
+
+        .week-info { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .week-info h2 { color: #2563eb; margin-bottom: 1rem; }
+        .week-details { display: flex; gap: 2rem; color: #6b7280; font-size: 0.875rem; flex-wrap: wrap; }
+
+        .tests-section h2 { color: #1f2937; margin-bottom: 1rem; }
+        .tests-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+
+        .test-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.3s; }
+        .test-card:hover { transform: translateY(-4px); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+        .test-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; }
+        .test-title { font-size: 1.25rem; font-weight: 600; color: #1f2937; }
+        .test-icon { font-size: 2rem; }
+        .test-info-item { display: flex; justify-content: space-between; padding: 0.5rem 0; color: #6b7280; font-size: 0.875rem; }
+        .test-status { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+        .status-not-started { background: #fee; color: #dc2626; }
+        .start-btn { width: 100%; padding: 0.75rem; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1rem; }
+        .start-btn:hover { background: #1d4ed8; }
+
+        .progress-summary { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .progress-summary h2 { color: #1f2937; margin-bottom: 1rem; }
+        .progress-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+        .stat-card { background: #f9fafb; padding: 1.5rem; border-radius: 8px; text-align: center; }
+        .stat-label { color: #6b7280; font-size: 0.875rem; margin-bottom: 0.5rem; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: #2563eb; }
+
+        .loading-screen { display: flex; justify-content: center; align-items: center; min-height: 60vh; font-size: 1.25rem; color: #6b7280; }
+
+        @media (max-width: 768px) {
+            .main-container { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingScreen" class="loading-screen">Loading...</div>
+
+    <div id="dashboardContent" style="display:none;">
+        <header class="header">
+            <div class="header-container">
+                <a href="/" class="logo">SmartSelective</a>
+                <div class="user-info">
+                    <span class="user-email" id="userEmail"></span>
+                    <button class="logout-btn" id="logoutBtn">Log Out</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <aside class="sidebar">
+                <h3>Menu</h3>
+                <nav>
+                    <a href="/dashboard.html" class="active">Dashboard</a>
+                    <a href="#">My Results</a>
+                    <a href="#">Practice History</a>
+                    <a href="#">Account Settings</a>
+                </nav>
+            </aside>
+
+            <main class="content">
+                <div class="welcome-card">
+                    <h1>Welcome back, <span id="userName">Student</span>! 👋</h1>
+                    <p>Ready to continue your preparation for VIC Selective Schools?</p>
+                </div>
+
+                <div class="week-info">
+                    <h2>Current Week</h2>
+                    <div class="week-details">
+                        <span>📅 <strong id="weekNumber">Week 1</strong></span>
+                        <span>🗓️ <span id="weekDates"></span></span>
+                        <span>⏰ Tests available: Tuesday - Sunday</span>
+                    </div>
+                </div>
+
+                <div class="tests-section">
+                    <h2>This Week's Tests</h2>
+                    <div class="tests-grid" id="testsGrid"></div>
+                </div>
+
+                <div class="progress-summary">
+                    <h2>Your Progress This Week</h2>
+                    <div class="progress-stats">
+                        <div class="stat-card">
+                            <div class="stat-label">Tests Completed</div>
+                            <div class="stat-value" id="testsCompleted">0/4</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Average Score</div>
+                            <div class="stat-value" id="averageScore">N/A</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Time Remaining</div>
+                            <div class="stat-value" id="timeRemaining">--</div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+    (function() {
+        var sb = window.supabase.createClient(
+            'https://qeowtqkfotypsrkfaniw.supabase.co',
+            'sb_publishable_Byg3sZUa0AzxVuyPEhY8GQ_3GGOidrj'
+        );
+
+        var tests = [
+            { id: 'reading', title: 'Reading Comprehension', icon: '📖', questions: '35-40 items', time: '35 minutes' },
+            { id: 'math', title: 'Mathematics', icon: '🔢', questions: '35-40 items', time: '30 minutes' },
+            { id: 'verbal', title: 'Verbal Reasoning', icon: '💬', questions: '40-50 items', time: '30 minutes' },
+            { id: 'quantitative', title: 'Quantitative Reasoning', icon: '🧮', questions: '35-40 items', time: '30 minutes' }
+        ];
+
+        function renderTests() {
+            var grid = document.getElementById('testsGrid');
+            grid.innerHTML = tests.map(function(t) {
+                return '<div class="test-card">' +
+                    '<div class="test-header"><div class="test-title">' + t.title + '</div><div class="test-icon">' + t.icon + '</div></div>' +
+                    '<div class="test-info-item"><span>Questions:</span><strong>' + t.questions + '</strong></div>' +
+                    '<div class="test-info-item"><span>Time Limit:</span><strong>' + t.time + '</strong></div>' +
+                    '<div class="test-info-item"><span>Status:</span><span class="test-status status-not-started">Not Started</span></div>' +
+                    '<button class="start-btn" onclick="alert(\'Coming soon: ' + t.title + '\')">Start Test</button>' +
+                '</div>';
+            }).join('');
+        }
+
+        function updateStats() {
+            var now = new Date();
+            var day = now.getDay();
+            var daysLeft = (day === 0) ? 0 : 7 - day;
+            document.getElementById('timeRemaining').textContent = (daysLeft === 0) ? 'Last day!' : daysLeft + ' days left';
+
+            var startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay() + 1);
+            var endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            var opts = { month: 'short', day: 'numeric' };
+            document.getElementById('weekDates').textContent = startOfWeek.toLocaleDateString('en-US', opts) + ' - ' + endOfWeek.toLocaleDateString('en-US', opts) + ', ' + now.getFullYear();
+        }
+
+        sb.auth.getSession().then(function(result) {
+            var session = result.data.session;
+            if (!session) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'block';
+
+            var email = session.user.email;
+            document.getElementById('userEmail').textContent = email;
+            document.getElementById('userName').textContent = email.split('@')[0];
+
+            renderTests();
+            updateStats();
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            sb.auth.signOut().then(function() {
+                window.location.href = '/login.html';
+            });
+        });
+    })();
+    </script>
+</body>
+</html>
