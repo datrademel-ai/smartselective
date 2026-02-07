@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartSelective — Test in Progress</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ============================================================
+   CSS VARIABLES & RESET
+   ============================================================ */
+:root {
+  --bg-deep: #0b0f1a;
+  --bg-primary: #0f1629;
+  --bg-panel: #151d33;
+  --bg-panel-alt: #1a2340;
+  --bg-hover: #1e2a4a;
+  --bg-selected: rgba(59,130,246,0.12);
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-glow: rgba(59,130,246,0.25);
+  --green: #10b981;
+  --green-bg: rgba(16,185,129,0.1);
+  --red: #ef4444;
+  --red-bg: rgba(239,68,68,0.08);
+  --orange: #f59e0b;
+  --orange-bg: rgba(245,158,11,0.1);
+  --purple: #8b5cf6;
+  --cyan: #06b6d4;
+  --text-primary: #f0f4f8;
+  --text-secondary: #94a3b8;
+  --text-muted: #5a6a80;
+  --border: rgba(255,255,255,0.06);
+  --border-active: rgba(59,130,246,0.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   LOADING STATE
+   ============================================================ */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-deep);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  gap: 24px;
+}
+
+.loading-overlay.hidden { display: none; }
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.error-message {
+  background: var(--red-bg);
+  border: 1px solid var(--red);
+  padding: 20px 32px;
+  border-radius: var(--radius-md);
+  color: var(--red);
+  text-align: center;
+  max-width: 400px;
+}
+
+.error-message h3 { margin-bottom: 8px; }
+
+.error-message a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* ============================================================
+   TOP BAR — fixed, full-width
+   ============================================================ */
+.topbar {
+  height: 56px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: relative;
+  z-index: 50;
+  flex-shrink: 0;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-sm {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 800; font-size: 16px; color: #fff;
+}
+
+.test-title {
+  font-weight: 600; font-size: 15px; color: var(--text-secondary);
+}
+
+.test-title strong { color: var(--text-primary); font-weight: 700; }
+
+.topbar-center {
+  position: absolute;
+  left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 20px;
+}
+
+/* Timer */
+.timer-display {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg-panel);
+  padding: 8px 20px;
+  border-radius: 28px;
+  border: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px; font-weight: 600;
+  letter-spacing: 1px;
+  min-width: 140px;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.timer-display.warning {
+  border-color: var(--orange);
+  color: var(--orange);
+  animation: timerPulse 1s ease-in-out infinite;
+}
+
+.timer-display.danger {
+  border-color: var(--red);
+  color: var(--red);
+  animation: timerPulse 0.5s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+  0%,100% { box-shadow: none; }
+  50% { box-shadow: 0 0 16px var(--red-bg); }
+}
+
+.timer-icon {
+  width: 18px; height: 18px;
+  opacity: 0.7;
+}
+
+/* Progress in topbar */
+.progress-info {
+  font-size: 13px; color: var(--text-muted);
+  display: flex; align-items: center; gap: 6px;
+}
+
+.progress-info strong {
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.topbar-right {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.topbar-btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600; font-size: 13px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.topbar-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.12);
+}
+
+.topbar-btn.btn-submit {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.topbar-btn.btn-submit:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* ============================================================
+   MAIN LAYOUT — left panel (questions) + right panel (passage)
+   ============================================================ */
+.exam-layout {
+  display: flex;
+  height: calc(100vh - 56px);
+  overflow: hidden;
+}
+
+/* LEFT PANEL — Question + Options */
+.left-panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+}
+
+/* RIGHT PANEL — Passage / Reading Material */
+.right-panel {
+  width: 48%;
+  min-width: 380px;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+}
+
+.right-panel.collapsed {
+  width: 0;
+  min-width: 0;
+  max-width: 0;
+  overflow: hidden;
+  border: none;
+}
+
+/* Resize handle */
+.resize-handle {
+  width: 6px;
+  cursor: col-resize;
+  background: transparent;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.resize-handle:hover,
+.resize-handle.active {
+  background: var(--accent);
+}
+
+.resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px; height: 40px;
+  border-radius: 2px;
+  background: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.resize-handle:hover::after { opacity: 0.5; }
+
+/* ============================================================
+   LEFT PANEL CONTENT
+   ============================================================ */
+.question-section {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px 48px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+
+.question-section::-webkit-scrollbar { width: 6px; }
+.question-section::-webkit-scrollbar-track { background: transparent; }
+.question-section::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+
+/* Question header */
+.q-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.q-number-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.q-num-circle {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; font-size: 18px; color: #fff;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.q-info {
+  display: flex; flex-direction: column; gap: 2px;
+}
+
+.q-subject-label {
+  font-size: 12px; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 1px;
+}
+
+.q-diff-label {
+  font-size: 12px; font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  width: fit-content;
+}
+
+.diff-easy { background: var(--green-bg); color: var(--green); }
+.diff-medium { background: var(--orange-bg); color: var(--orange); }
+.diff-hard { background: var(--red-bg); color: var(--red); }
+
+.q-actions {
+  display: flex; gap: 8px;
+}
+
+.q-action-btn {
+  width: 40px; height: 40px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.q-action-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.q-action-btn.flagged {
+  background: var(--orange-bg);
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+/* Question text */
+.question-text {
+  font-size: 17px;
+  line-height: 1.8;
+  color: var(--text-primary);
+  margin-bottom: 32px;
+  font-weight: 500;
+}
+
+/* Options */
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.option-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 18px 22px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.option-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent-glow), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.option-item:hover {
+  border-color: rgba(255,255,255,0.15);
+  background: var(--bg-hover);
+}
+
+.option-item.selected {
+  border-color: var(--accent);
+  background: var(--bg-selected);
+}
+
+.option-item.selected::before { opacity: 1; }
+
+.option-item.selected .option-letter {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.option-letter {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; font-size: 14px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.option-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  padding-top: 6px;
+  position: relative;
+  z-index: 1;
+  transition: color 0.2s ease;
+}
+
+.option-item.selected .option-text { color: var(--text-primary); }
+.option-item:hover .option-text { color: var(--text-primary); }
+
+/* Keyboard shortcut hint */
+.option-shortcut {
+  position: absolute;
+  right: 18px; top: 50%;
+  transform: translateY(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.2s;
+  background: var(--bg-panel);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  z-index: 1;
+}
+
+.option-item:hover .option-shortcut { opacity: 0.6; }
+
+/* ============================================================
+   BOTTOM NAV — Previous / Next + Question map
+   ============================================================ */
+.bottom-nav {
+  flex-shrink: 0;
+  padding: 16px 32px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-btn {
+  padding: 12px 28px;
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600; font-size: 14px;
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.nav-btn-prev {
+  background: var(--bg-panel);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.nav-btn-prev:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+.nav-btn-next {
+  background: var(--accent);
+  color: #fff;
+}
+
+.nav-btn-next:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* Question map (mini) */
+.q-map-strip {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  max-width: 500px;
+  justify-content: center;
+}
+
+.q-dot {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  position: relative;
+}
+
+.q-dot:hover { background: var(--bg-hover); color: var(--text-primary); }
+.q-dot.current { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+.q-dot.answered { background: var(--green-bg); color: var(--green); border-color: rgba(16,185,129,0.3); }
+.q-dot.flagged-dot::after {
+  content: '';
+  position: absolute;
+  top: -2px; right: -2px;
+  width: 8px; height: 8px;
+  background: var(--orange);
+  border-radius: 50%;
+  border: 2px solid var(--bg-primary);
+}
+
+/* ============================================================
+   RIGHT PANEL — Passage
+   ============================================================ */
+.passage-header {
+  padding: 16px 28px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.passage-title {
+  font-weight: 600; font-size: 14px;
+  color: var(--text-secondary);
+  display: flex; align-items: center; gap: 8px;
+}
+
+.passage-title-icon {
+  width: 28px; height: 28px;
+  background: rgba(6,182,212,0.1);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.passage-controls {
+  display: flex; gap: 6px;
+}
+
+.passage-ctrl-btn {
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.passage-ctrl-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+.passage-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 36px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.06) transparent;
+}
+
+.passage-body::-webkit-scrollbar { width: 5px; }
+.passage-body::-webkit-scrollbar-track { background: transparent; }
+.passage-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 3px; }
+
+.passage-content {
+  font-size: 15px;
+  line-height: 2;
+  color: var(--text-secondary);
+  transition: font-size 0.3s ease;
+}
+
+.passage-content p {
+  margin-bottom: 20px;
+  text-indent: 2em;
+}
+
+.passage-content p:first-child { text-indent: 0; }
+
+.passage-content .highlight-line {
+  background: rgba(245,158,11,0.08);
+  border-left: 3px solid var(--orange);
+  padding: 4px 12px;
+  margin: 8px -12px;
+  border-radius: 0 6px 6px 0;
+}
+
+.passage-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.no-passage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  text-align: center;
+  gap: 16px;
+  padding: 40px;
+}
+
+.no-passage svg { opacity: 0.4; }
+
+/* ============================================================
+   MODAL — Navigator & Submit
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-box {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  min-width: 400px;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-title {
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.modal-sub {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+/* Navigator grid */
+.nav-legend {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.nav-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.legend-swatch {
+  width: 16px; height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.nav-cell {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-cell:hover { background: var(--bg-hover); }
+.nav-cell.current { background: var(--accent); color: #fff; border-color: var(--accent); }
+.nav-cell.answered { background: var(--green-bg); color: var(--green); border-color: rgba(16,185,129,0.3); }
+.nav-cell.flagged-cell { border-color: var(--orange); }
+
+/* Submit stats */
+.submit-stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.submit-stat {
+  text-align: center;
+  flex: 1;
+  padding: 16px;
+  background: var(--bg-panel-alt);
+  border-radius: var(--radius-sm);
+}
+
+.submit-stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.submit-stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.modal-btn {
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.modal-btn-cancel {
+  background: var(--bg-panel-alt);
+  color: var(--text-secondary);
+}
+
+.modal-btn-cancel:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+.modal-btn-submit {
+  background: var(--accent);
+  color: #fff;
+}
+
+.modal-btn-submit:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* ============================================================
+   PROGRESS BAR (in bottom nav)
+   ============================================================ */
+.progress-bar-wrap {
+  width: 200px;
+  height: 6px;
+  background: var(--bg-panel);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--green));
+  border-radius: 3px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .right-panel {
+    display: none;
+  }
+  .resize-handle { display: none; }
+  .question-section { padding: 24px; }
+  .topbar-center { display: none; }
+  .q-map-strip { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loadingText">Loading test...</div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-sm">S</div>
+    <div class="test-title" id="testTitleDisplay">Loading...</div>
+  </div>
+  <div class="topbar-center">
+    <div class="timer-display" id="timerDisplay">
+      <svg class="timer-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <span id="timerText">--:--</span>
+    </div>
+    <div class="progress-info">
+      <span id="answeredCount"><strong>0</strong></span>
+      <span>answered</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="topbar-btn" onclick="openNavigator()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Navigator
+    </button>
+    <button class="topbar-btn btn-submit" onclick="openSubmitModal()">Submit Test</button>
+  </div>
+</div>
+
+<!-- MAIN EXAM LAYOUT -->
+<div class="exam-layout">
+  <!-- LEFT: Question -->
+  <div class="left-panel">
+    <div class="question-section" id="questionSection">
+      <div class="q-top-bar">
+        <div class="q-number-badge">
+          <div class="q-num-circle" id="qNumCircle">1</div>
+          <div class="q-info">
+            <div class="q-subject-label" id="qSubject">Loading...</div>
+          </div>
+        </div>
+        <div class="q-actions">
+          <button class="q-action-btn" id="flagBtn" onclick="toggleFlag()" title="Flag for review">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          </button>
+          <button class="q-action-btn" onclick="clearAnswer()" title="Clear answer">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="question-text" id="questionText">Loading question...</div>
+
+      <div class="options-list" id="optionsList">
+        <!-- Options rendered by JS -->
+      </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="bottom-nav">
+      <button class="nav-btn nav-btn-prev" id="prevBtn" onclick="prevQuestion()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        Previous
+      </button>
+      <div class="q-map-strip" id="qMapStrip">
+        <!-- Dots rendered by JS -->
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <button class="nav-btn nav-btn-next" id="nextBtn" onclick="nextQuestion()">
+        Next
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- RESIZE HANDLE -->
+  <div class="resize-handle" id="resizeHandle"></div>
+
+  <!-- RIGHT PANEL: Passage -->
+  <div class="right-panel" id="rightPanel">
+    <div class="passage-header">
+      <div class="passage-title">
+        <div class="passage-title-icon">
+          <svg width="16" height="16" fill="none" stroke="var(--cyan)" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        </div>
+        <span id="passageLabel">Reading Passage</span>
+      </div>
+      <div class="passage-controls">
+        <button class="passage-ctrl-btn" onclick="changePassageFontSize(-1)" title="Decrease font">A−</button>
+        <button class="passage-ctrl-btn" onclick="changePassageFontSize(1)" title="Increase font">A+</button>
+        <button class="passage-ctrl-btn" onclick="collapseRightPanel()" title="Collapse panel">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="passage-body">
+      <div class="passage-content" id="passageContent">
+        <div class="no-passage" id="noPassage">
+          <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          <p>No passage for this question</p>
+          <p style="font-size:12px">Passage will appear here when relevant</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     NAVIGATOR MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="navModal">
+  <div class="modal-box">
+    <div class="modal-title">Question Navigator</div>
+    <div class="modal-sub">Click any question to jump to it</div>
+    <div class="nav-legend">
+      <div class="nav-legend-item"><div class="legend-swatch" style="background:var(--accent)"></div> Current</div>
+      <div class="nav-legend-item"><div class="legend-swatch" style="background:var(--green-bg);border-color:rgba(16,185,129,0.3)"></div> Answered</div>
+      <div class="nav-legend-item"><div class="legend-swatch" style="border-color:var(--orange)"></div> Flagged</div>
+      <div class="nav-legend-item"><div class="legend-swatch"></div> Unanswered</div>
+    </div>
+    <div class="nav-grid" id="navGrid"></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeNavigator()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SUBMIT MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="submitModal">
+  <div class="modal-box">
+    <div class="modal-title">Submit Test?</div>
+    <div class="modal-sub">Review your progress before submitting</div>
+    <div class="submit-stats">
+      <div class="submit-stat">
+        <div class="submit-stat-value" style="color:var(--green)" id="submitAnswered">0</div>
+        <div class="submit-stat-label">Answered</div>
+      </div>
+      <div class="submit-stat">
+        <div class="submit-stat-value" style="color:var(--orange)" id="submitUnanswered">0</div>
+        <div class="submit-stat-label">Unanswered</div>
+      </div>
+      <div class="submit-stat">
+        <div class="submit-stat-value" style="color:var(--orange)" id="submitFlagged">0</div>
+        <div class="submit-stat-label">Flagged</div>
+      </div>
+    </div>
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:20px" id="submitWarning"></p>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeSubmitModal()">Continue Test</button>
+      <button class="modal-btn modal-btn-submit" onclick="submitTest()">Submit Test</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ============================================================
+//  SUPABASE CONFIGURATION
+// ============================================================
+const SUPABASE_URL = 'https://qeowtqkfotypsrkfaniw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlb3d0cWtmb3R5cHNya2Zhbml3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxNDUwNjYsImV4cCI6MjA4NTcyMTA2Nn0.Og5eSoXdP-5hSEC1CnH1jYZ8BiscaL9Ah5KhQhaO0eA';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================================
+//  SUBJECT CONFIG (for display)
+// ============================================================
+const SUBJECT_CONFIG = {
+  'reading': { name: 'Reading Comprehension', color: '#3b82f6', icon: '📖' },
+  'math': { name: 'Mathematics', color: '#10b981', icon: '🔢' },
+  'numerical': { name: 'Quantitative Reasoning', color: '#8b5cf6', icon: '🧩' },
+  'verbal': { name: 'Verbal Reasoning', color: '#f59e0b', icon: '✍️' }
+};
+
+// ============================================================
+//  STATE
+// ============================================================
+let TEST_DATA = null;
+let currentQ = 0;
+let answers = [];
+let flags = [];
+let questionTimes = [];
+let timeRemaining = 0;
+let timerInterval = null;
+let passageFontSize = 15;
+let testStartTime = null;
+
+// ============================================================
+//  LOAD TEST FROM SUPABASE
+// ============================================================
+async function loadTest() {
+  const loadingText = document.getElementById('loadingText');
+  
+  try {
+    // Get test_id from URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const testId = urlParams.get('test_id');
+    
+    if (!testId) {
+      showError('No test ID provided. Please select a test from the dashboard.');
+      return;
+    }
+    
+    loadingText.textContent = 'Fetching test information...';
+    
+    // Fetch test metadata
+    const { data: testData, error: testError } = await supabase
+      .from('weekly_tests')
+      .select('*')
+      .eq('id', testId)
+      .single();
+    
+    if (testError) throw testError;
+    if (!testData) throw new Error('Test not found');
+    
+    loadingText.textContent = 'Loading questions...';
+    
+    // Fetch questions for this test
+    const { data: questions, error: qError } = await supabase
+      .from('questions')
+      .select('*')
+      .eq('test_id', testId)
+      .order('question_order', { ascending: true });
+    
+    if (qError) throw qError;
+    if (!questions || questions.length === 0) throw new Error('No questions found for this test');
+    
+    // Build TEST_DATA structure
+    const subjectConfig = SUBJECT_CONFIG[testData.subject] || { 
+      name: testData.title, 
+      color: '#3b82f6', 
+      icon: '📝' 
+    };
+    
+    TEST_DATA = {
+      testId: testData.id,
+      testName: testData.title,
+      subject: testData.subject,
+      timeLimit: testData.time_limit_minutes * 60, // Convert to seconds
+      subjectConfig: subjectConfig,
+      questions: questions.map((q, idx) => ({
+        id: q.question_order || (idx + 1),
+        dbId: q.id,
+        subject: subjectConfig.name,
+        passage: q.passage,
+        question: q.question_text,
+        options: [q.option_a, q.option_b, q.option_c, q.option_d],
+        correctAnswer: q.correct_answer,
+        explanation: q.explanation
+      }))
+    };
+    
+    // Initialize state arrays
+    answers = new Array(TEST_DATA.questions.length).fill(null);
+    flags = new Array(TEST_DATA.questions.length).fill(false);
+    questionTimes = new Array(TEST_DATA.questions.length).fill(0);
+    timeRemaining = TEST_DATA.timeLimit;
+    testStartTime = Date.now();
+    
+    // Hide loading, show test
+    document.getElementById('loadingOverlay').classList.add('hidden');
+    
+    // Initialize UI
+    initTest();
+    
+  } catch (error) {
+    console.error('Error loading test:', error);
+    showError(error.message || 'Failed to load test. Please try again.');
+  }
+}
+
+function showError(message) {
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.innerHTML = `
+    <div class="error-message">
+      <h3>⚠️ Error</h3>
+      <p>${message}</p>
+      <p style="margin-top:16px"><a href="dashboard.html">← Back to Dashboard</a></p>
+    </div>
+  `;
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+function initTest() {
+  // Update UI with test info
+  document.getElementById('testTitleDisplay').innerHTML = 
+    `<strong>${TEST_DATA.testName}</strong>`;
+  
+  buildQuestionMap();
+  startTimer();
+  setupKeyboard();
+  setupResize();
+  renderQuestion();
+}
+
+// ============================================================
+//  TIMER
+// ============================================================
+function startTimer() {
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timeRemaining--;
+    questionTimes[currentQ]++;
+    updateTimerDisplay();
+
+    if (timeRemaining <= 0) {
+      clearInterval(timerInterval);
+      autoSubmit();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const mins = Math.floor(timeRemaining / 60);
+  const secs = timeRemaining % 60;
+  const display = document.getElementById('timerDisplay');
+  document.getElementById('timerText').textContent = 
+    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+  display.classList.remove('warning', 'danger');
+  if (timeRemaining <= 60) display.classList.add('danger');
+  else if (timeRemaining <= 300) display.classList.add('warning');
+}
+
+// ============================================================
+//  RENDER QUESTION
+// ============================================================
+function renderQuestion() {
+  const q = TEST_DATA.questions[currentQ];
+
+  // Header
+  document.getElementById('qNumCircle').textContent = q.id;
+  document.getElementById('qSubject').textContent = q.subject;
+
+  // Flag button
+  const flagBtn = document.getElementById('flagBtn');
+  flagBtn.classList.toggle('flagged', flags[currentQ]);
+
+  // Question text
+  document.getElementById('questionText').textContent = q.question;
+
+  // Options
+  const optList = document.getElementById('optionsList');
+  optList.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, idx) => {
+    const item = document.createElement('div');
+    item.className = 'option-item' + (answers[currentQ] === idx ? ' selected' : '');
+    item.onclick = () => selectOption(idx);
+    item.innerHTML = `
+      <div class="option-letter">${letters[idx]}</div>
+      <div class="option-text">${opt}</div>
+      <div class="option-shortcut">Press ${letters[idx]}</div>
+    `;
+    optList.appendChild(item);
+  });
+
+  // Passage (right panel)
+  renderPassage(q);
+
+  // Update nav
+  updateProgress();
+  updateQuestionMap();
+
+  // Prev/Next button states
+  document.getElementById('prevBtn').style.opacity = currentQ === 0 ? '0.4' : '1';
+  document.getElementById('prevBtn').style.pointerEvents = currentQ === 0 ? 'none' : 'auto';
+}
+
+function renderPassage(q) {
+  const content = document.getElementById('passageContent');
+  const label = document.getElementById('passageLabel');
+
+  if (q.passage) {
+    content.innerHTML = `<div class="passage-label">${q.subject}</div>${q.passage}`;
+    content.style.fontSize = passageFontSize + 'px';
+    label.textContent = 'Reading Passage';
+    document.getElementById('rightPanel').classList.remove('collapsed');
+  } else {
+    content.innerHTML = `<div class="no-passage">
+      <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      <p>No passage for this question</p>
+      <p style="font-size:12px;margin-top:4px">This is a standalone ${q.subject} question</p>
+    </div>`;
+    label.textContent = q.subject;
+  }
+}
+
+// ============================================================
+//  SELECT / NAVIGATE
+// ============================================================
+function selectOption(idx) {
+  answers[currentQ] = idx;
+  renderQuestion();
+}
+
+function clearAnswer() {
+  answers[currentQ] = null;
+  renderQuestion();
+}
+
+function toggleFlag() {
+  flags[currentQ] = !flags[currentQ];
+  renderQuestion();
+}
+
+function nextQuestion() {
+  if (currentQ < TEST_DATA.questions.length - 1) {
+    currentQ++;
+    renderQuestion();
+    scrollToTop();
+  }
+}
+
+function prevQuestion() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQuestion();
+    scrollToTop();
+  }
+}
+
+function goToQuestion(idx) {
+  currentQ = idx;
+  renderQuestion();
+  scrollToTop();
+  closeNavigator();
+}
+
+function scrollToTop() {
+  document.getElementById('questionSection').scrollTop = 0;
+}
+
+// ============================================================
+//  PROGRESS & QUESTION MAP
+// ============================================================
+function updateProgress() {
+  const answered = answers.filter(a => a !== null).length;
+  const total = TEST_DATA.questions.length;
+  document.getElementById('answeredCount').innerHTML = `<strong>${answered}</strong>`;
+  document.getElementById('progressBar').style.width = `${(answered/total)*100}%`;
+}
+
+function buildQuestionMap() {
+  const strip = document.getElementById('qMapStrip');
+  strip.innerHTML = '';
+  TEST_DATA.questions.forEach((q, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'q-dot';
+    dot.textContent = q.id;
+    dot.onclick = () => goToQuestion(i);
+    strip.appendChild(dot);
+  });
+}
+
+function updateQuestionMap() {
+  const dots = document.querySelectorAll('.q-dot');
+  dots.forEach((dot, i) => {
+    dot.className = 'q-dot';
+    if (i === currentQ) dot.classList.add('current');
+    else if (answers[i] !== null) dot.classList.add('answered');
+    if (flags[i]) dot.classList.add('flagged-dot');
+  });
+}
+
+// ============================================================
+//  NAVIGATOR MODAL
+// ============================================================
+function openNavigator() {
+  const grid = document.getElementById('navGrid');
+  grid.innerHTML = '';
+  TEST_DATA.questions.forEach((q, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'nav-cell';
+    if (i === currentQ) cell.classList.add('current');
+    else if (answers[i] !== null) cell.classList.add('answered');
+    if (flags[i]) cell.classList.add('flagged-cell');
+    cell.textContent = q.id;
+    cell.onclick = () => goToQuestion(i);
+    grid.appendChild(cell);
+  });
+  document.getElementById('navModal').classList.add('show');
+}
+
+function closeNavigator() {
+  document.getElementById('navModal').classList.remove('show');
+}
+
+// ============================================================
+//  SUBMIT MODAL
+// ============================================================
+function openSubmitModal() {
+  const answered = answers.filter(a => a !== null).length;
+  const unanswered = answers.length - answered;
+  const flagged = flags.filter(f => f).length;
+
+  document.getElementById('submitAnswered').textContent = answered;
+  document.getElementById('submitUnanswered').textContent = unanswered;
+  document.getElementById('submitFlagged').textContent = flagged;
+
+  let warning = '';
+  if (unanswered > 0) warning += `⚠️ You have ${unanswered} unanswered question${unanswered>1?'s':''}. `;
+  if (flagged > 0) warning += `🚩 ${flagged} question${flagged>1?'s are':' is'} flagged for review.`;
+  if (!warning) warning = '✅ All questions answered. Ready to submit!';
+  document.getElementById('submitWarning').textContent = warning;
+
+  document.getElementById('submitModal').classList.add('show');
+}
+
+function closeSubmitModal() {
+  document.getElementById('submitModal').classList.remove('show');
+}
+
+async function submitTest() {
+  clearInterval(timerInterval);
+
+  // Calculate time spent
+  const totalTimeSpent = Math.floor((Date.now() - testStartTime) / 1000);
+
+  // Build results object compatible with results.html
+  const results = {
+    testId: TEST_DATA.testId,
+    testName: TEST_DATA.testName,
+    totalQuestions: TEST_DATA.questions.length,
+    timeLimit: TEST_DATA.timeLimit,
+    timeSpent: totalTimeSpent,
+    subjects: [TEST_DATA.subjectConfig],
+    questions: TEST_DATA.questions.map((q, i) => ({
+      ...q,
+      userAnswer: answers[i],
+      timeSpent: questionTimes[i]
+    }))
+  };
+
+  // Save to localStorage for results page
+  localStorage.setItem('smartselective_results', JSON.stringify(results));
+  
+  // Redirect to results
+  window.location.href = 'results.html';
+}
+
+function autoSubmit() {
+  alert('⏰ Time is up! Your test will be submitted automatically.');
+  submitTest();
+}
+
+// ============================================================
+//  KEYBOARD SHORTCUTS
+// ============================================================
+function setupKeyboard() {
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    const key = e.key.toLowerCase();
+    if (key === 'a') selectOption(0);
+    else if (key === 'b') selectOption(1);
+    else if (key === 'c') selectOption(2);
+    else if (key === 'd') selectOption(3);
+    else if (key === 'arrowright' || key === 'n') nextQuestion();
+    else if (key === 'arrowleft' || key === 'p') prevQuestion();
+    else if (key === 'f') toggleFlag();
+    else if (key === 'escape') { closeNavigator(); closeSubmitModal(); }
+  });
+}
+
+// ============================================================
+//  PASSAGE PANEL — Font size & Resize
+// ============================================================
+function changePassageFontSize(delta) {
+  passageFontSize = Math.max(12, Math.min(22, passageFontSize + delta));
+  document.getElementById('passageContent').style.fontSize = passageFontSize + 'px';
+}
+
+function collapseRightPanel() {
+  document.getElementById('rightPanel').classList.toggle('collapsed');
+}
+
+function setupResize() {
+  const handle = document.getElementById('resizeHandle');
+  const rightPanel = document.getElementById('rightPanel');
+  let isResizing = false;
+
+  handle.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    handle.classList.add('active');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    const containerWidth = document.querySelector('.exam-layout').offsetWidth;
+    const newWidth = containerWidth - e.clientX;
+    const clamped = Math.max(300, Math.min(containerWidth * 0.6, newWidth));
+    rightPanel.style.width = clamped + 'px';
+    rightPanel.style.maxWidth = clamped + 'px';
+    rightPanel.style.minWidth = clamped + 'px';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (isResizing) {
+      isResizing = false;
+      handle.classList.remove('active');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+  });
+}
+
+// Close modals on overlay click
+document.getElementById('navModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('navModal')) closeNavigator();
+});
+document.getElementById('submitModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('submitModal')) closeSubmitModal();
+});
+
+// ============================================================
+//  INITIALIZE ON PAGE LOAD
+// ============================================================
+document.addEventListener('DOMContentLoaded', loadTest);
+</script>
+
+</body>
+</html>
