@@ -64,7 +64,7 @@
 // ============================================================
 var SB = window.supabase.createClient(
     'https://qeowtqkfotypsrkfaniw.supabase.co',
-    'sb_publishable_Byg3sZUa0AzxVuyPEhY8GQ_3GGOidrj'
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlb3d0cWtmb3R5cHNya2Zhbml3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxNDUwNjYsImV4cCI6MjA4NTcyMTA2Nn0.Og5eSoXdP-5hSEC1CnH1jYZ8BiscaL9Ah5KhQhaO0eA'
 );
 
 var SUBJ=[
@@ -841,37 +841,16 @@ SS.start = async function(subject) {
     var wq = S.weekQuestions[subject];
     if (!wq || !wq.questions || wq.questions.length === 0) { toast('No questions available.', 'w'); return; }
 
-    var sj = SUBJ.find(function(s) { return s.id === subject; });
-    var timeSec = (wq.time || sj.time) * 60;
-
-    // Create attempt in DB
-    var attempt = await dbCreateAttempt(wq.testId, w.k, timeSec);
-    if (!attempt) { toast('Could not start test.', 'w'); return; }
-
-    // Normalize questions to standard format
-    var qs = wq.questions.map(function(q) {
-        return { id: q.id, passage: q.passage, question: q.question_text, options: [q.option_a, q.option_b, q.option_c, q.option_d], correctAnswer: q.correct_answer, explanation: q.explanation };
-    });
-
-    S.cur = { tid: subject, testId: wq.testId, attemptId: attempt.id, wk: w.k, qs: qs, ans: attempt.answers || {}, qi: attempt.current_question || 0, tl: attempt.time_remaining_seconds || timeSec, sa: Date.now() };
-    S.paused = false;
-    openM(sj, true);
+    // Redirect to full-screen test page
+    window.location.href = 'test.html?test_id=' + wq.testId;
 };
 
 SS.resume = async function(subject) {
     var wq = S.weekQuestions[subject];
     if (!wq) { toast('Test not found.', 'w'); return; }
-    var attempt = S.attempts.find(function(a) { return a.test_id === wq.testId && (a.status === 'in_progress' || a.status === 'paused'); });
-    if (!attempt) { toast('No saved progress.', 'w'); return; }
-
-    var sj = SUBJ.find(function(s) { return s.id === subject; });
-    var qs = wq.questions.map(function(q) {
-        return { id: q.id, passage: q.passage, question: q.question_text, options: [q.option_a, q.option_b, q.option_c, q.option_d], correctAnswer: q.correct_answer, explanation: q.explanation };
-    });
-
-    S.cur = { tid: subject, testId: wq.testId, attemptId: attempt.id, wk: attempt.week_key, qs: qs, ans: attempt.answers || {}, qi: attempt.current_question || 0, tl: attempt.time_remaining_seconds, sa: Date.now() };
-    S.paused = false;
-    openM(sj, false);
+    
+    // Redirect to full-screen test page
+    window.location.href = 'test.html?test_id=' + wq.testId;
 };
 
 function openM(sj, pre) {
