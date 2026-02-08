@@ -157,7 +157,7 @@
     (function() {
         var sb = window.supabase.createClient(
             'https://qeowtqkfotypsrkfaniw.supabase.co',
-            'sb_publishable_Byg3sZUa0AzxVuyPEhY8GQ_3GGOidrj'
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlb3d0cWtmb3R5cHNya2Zhbml3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxNDUwNjYsImV4cCI6MjA4NTcyMTA2Nn0.Og5eSoXdP-5hSEC1CnH1jYZ8BiscaL9Ah5KhQhaO0eA'
         );
 
         var form = document.getElementById('signupForm');
@@ -178,6 +178,13 @@
             var hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pw);
             return pw.length >= 8 && hasLetter && hasNumber && hasSpecial;
         }
+
+        // 이미 로그인되어 있으면 대시보드로 리다이렉트
+        sb.auth.getSession().then(function(r) {
+            if (r.data.session) {
+                window.location.href = '/dashboard.html';
+            }
+        });
 
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -224,31 +231,53 @@
                 });
                 if (authResult.error) throw authResult.error;
 
-                // 2. Insert profile into users table
                 var user = authResult.data.user;
-                if (user) {
-                    var profileResult = await sb.from('users').upsert({
-                        id: user.id,
-                        email: email,
-                        last_name: lastName,
-                        first_name: firstName,
-                        phone: phone,
-                        privacy_agreed: privacyOk,
-                        email_collection_agreed: emailOk,
-                        marketing_agreed: marketingOk
-                    });
-                    if (profileResult.error) {
-                        console.warn('Profile save warning:', profileResult.error.message);
-                    }
+                if (!user) throw new Error('Failed to create account.');
+
+                // 2. 세션 ID 생성 (단일 기기 로그인용)
+                var sessionId = crypto.randomUUID();
+
+                // 3. profiles 테이블에 저장
+                var displayName = firstName + ' ' + lastName;
+                var profileResult = await sb.from('profiles').upsert({
+                    id: user.id,
+                    email: email,
+                    display_name: displayName,
+                    phone: phone,
+                    role: 'student',
+                    is_active: true,
+                    subscription_status: 'none',
+                    active_session_id: sessionId,
+                    last_active: new Date().toISOString(),
+                    privacy_agreed: privacyOk,
+                    email_collection_agreed: emailOk,
+                    marketing_agreed: marketingOk
+                });
+                
+                if (profileResult.error) {
+                    console.warn('Profile save warning:', profileResult.error.message);
                 }
 
-                // 3. Success
-                successDiv.innerHTML = 'Account created successfully!<br>Please check your email to verify your account, then <a href="/login.html" style="color:#16a34a;font-weight:600;">log in here</a>.';
-                successDiv.style.display = 'block';
-                form.style.display = 'none';
+                // 4. localStorage에 세션 ID 저장
+                localStorage.setItem('ss_session_id', sessionId);
+
+                // 5. 이메일 확인이 필요한지 체크
+                if (authResult.data.session) {
+                    // 이메일 확인 없이 바로 로그인됨 → 대시보드로 이동
+                    window.location.href = '/dashboard.html';
+                } else {
+                    // 이메일 확인 필요
+                    successDiv.innerHTML = '✅ Account created successfully!<br><br>Please check your email (<b>' + email + '</b>) to verify your account, then <a href="/login.html" style="color:#16a34a;font-weight:600;">log in here</a>.';
+                    successDiv.style.display = 'block';
+                    form.style.display = 'none';
+                }
 
             } catch (err) {
-                showError(err.message || 'An error occurred. Please try again.');
+                var errMsg = err.message || 'An error occurred. Please try again.';
+                if (errMsg.includes('already registered')) {
+                    errMsg = 'This email is already registered. Please log in or use a different email.';
+                }
+                showError(errMsg);
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Create Account';
                 // Reset Turnstile
