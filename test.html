@@ -231,27 +231,29 @@ html, body {
    ============================================================ */
 .exam-layout {
   display: flex;
+  flex-direction: row-reverse;
   height: calc(100vh - 56px);
   overflow: hidden;
 }
 
-/* LEFT PANEL — Question + Options */
+/* RIGHT PANEL (now visually LEFT) — Passage / Reading Material */
+.right-panel {
+  width: 45%;
+  min-width: 320px;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  order: -1;
+  border-right: 1px solid var(--border);
+}
+
+/* LEFT PANEL (now visually RIGHT) — Question + Options */
 .left-panel {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--border);
-}
-
-/* RIGHT PANEL — Passage / Reading Material */
-.right-panel {
-  width: 48%;
-  min-width: 380px;
-  max-width: 680px;
-  display: flex;
-  flex-direction: column;
-  background: var(--bg-primary);
 }
 
 .right-panel.collapsed {
@@ -708,53 +710,6 @@ html, body {
   margin-bottom: 24px;
 }
 
-/* Navigator grid */
-.nav-legend {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-
-.nav-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.legend-swatch {
-  width: 16px; height: 16px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-}
-
-.nav-grid {
-  display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 8px;
-  margin-bottom: 24px;
-}
-
-.nav-cell {
-  aspect-ratio: 1;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.nav-cell:hover { background: var(--bg-hover); }
-.nav-cell.current { background: var(--accent); color: #fff; border-color: var(--accent); }
-.nav-cell.answered { background: var(--green-bg); color: var(--green); border-color: rgba(16,185,129,0.3); }
-.nav-cell.flagged-cell { border-color: var(--orange); }
-
 /* Submit stats */
 .submit-stats {
   display: flex;
@@ -837,14 +792,70 @@ html, body {
 /* ============================================================
    RESPONSIVE
    ============================================================ */
+/* Mobile Tab Buttons */
+.mobile-tabs {
+  display: none;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+}
+
+.mobile-tab {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mobile-tab.active {
+  color: var(--accent);
+  background: var(--bg-selected);
+  border-bottom: 2px solid var(--accent);
+}
+
 @media (max-width: 900px) {
+  .exam-layout {
+    flex-direction: column;
+  }
+  
+  .mobile-tabs {
+    display: flex;
+  }
+  
   .right-panel {
     display: none;
+    width: 100%;
+    max-width: 100%;
+    min-width: 100%;
+    height: calc(100vh - 56px - 48px - 70px);
+    order: 0;
+    border-right: none;
   }
+  
+  .right-panel.mobile-visible {
+    display: flex;
+  }
+  
+  .left-panel {
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 56px - 48px - 70px);
+  }
+  
+  .left-panel.mobile-hidden {
+    display: none;
+  }
+  
   .resize-handle { display: none; }
-  .question-section { padding: 24px; }
+  .question-section { padding: 20px 16px; padding-bottom: 20px; }
   .topbar-center { display: none; }
   .q-map-strip { display: none; }
+  .progress-bar-wrap { display: none; }
   
   /* Mobile footer fix */
   .bottom-nav {
@@ -856,20 +867,16 @@ html, body {
     z-index: 100;
     background: var(--bg-primary);
     border-top: 1px solid var(--border);
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   
   .nav-btn {
-    padding: 10px 16px;
-    font-size: 13px;
-  }
-  
-  .progress-bar-wrap {
-    display: none;
-  }
-  
-  .left-panel {
-    padding-bottom: 80px; /* Space for fixed footer */
+    padding: 12px 20px;
+    font-size: 14px;
+    min-width: 100px;
   }
 }
 
@@ -879,8 +886,9 @@ html, body {
   }
   
   .nav-btn {
-    padding: 8px 12px;
-    font-size: 12px;
+    padding: 10px 16px;
+    font-size: 13px;
+    min-width: 90px;
     gap: 4px;
   }
   
@@ -888,6 +896,8 @@ html, body {
     width: 14px;
     height: 14px;
   }
+  
+  .question-section { padding: 16px 12px; }
 }
 </style>
 </head>
@@ -916,12 +926,18 @@ html, body {
     </div>
   </div>
   <div class="topbar-right">
-    <button class="topbar-btn" onclick="openNavigator()">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      Navigator
+    <button class="topbar-btn" id="pauseBtn" onclick="togglePause()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      Pause
     </button>
     <button class="topbar-btn btn-submit" onclick="openSubmitModal()">Submit Test</button>
   </div>
+</div>
+
+<!-- MOBILE TABS -->
+<div class="mobile-tabs" id="mobileTabs">
+  <button class="mobile-tab" id="tabPassage" onclick="showMobileTab('passage')">📖 Passage</button>
+  <button class="mobile-tab active" id="tabQuestion" onclick="showMobileTab('question')">❓ Question</button>
 </div>
 
 <!-- MAIN EXAM LAYOUT -->
@@ -1008,23 +1024,6 @@ html, body {
 <!-- ============================================================
      NAVIGATOR MODAL
      ============================================================ -->
-<div class="modal-overlay" id="navModal">
-  <div class="modal-box">
-    <div class="modal-title">Question Navigator</div>
-    <div class="modal-sub">Click any question to jump to it</div>
-    <div class="nav-legend">
-      <div class="nav-legend-item"><div class="legend-swatch" style="background:var(--accent)"></div> Current</div>
-      <div class="nav-legend-item"><div class="legend-swatch" style="background:var(--green-bg);border-color:rgba(16,185,129,0.3)"></div> Answered</div>
-      <div class="nav-legend-item"><div class="legend-swatch" style="border-color:var(--orange)"></div> Flagged</div>
-      <div class="nav-legend-item"><div class="legend-swatch"></div> Unanswered</div>
-    </div>
-    <div class="nav-grid" id="navGrid"></div>
-    <div class="modal-actions">
-      <button class="modal-btn modal-btn-cancel" onclick="closeNavigator()">Close</button>
-    </div>
-  </div>
-</div>
-
 <!-- ============================================================
      SUBMIT MODAL
      ============================================================ -->
@@ -1085,6 +1084,7 @@ let questionTimes = [];
 let timeRemaining = 0;
 let timerInterval = null;
 let passageFontSize = 15;
+let isPaused = false;
 let testStartTime = null;
 
 // ============================================================
@@ -1203,6 +1203,7 @@ function initTest() {
 function startTimer() {
   updateTimerDisplay();
   timerInterval = setInterval(() => {
+    if (isPaused) return; // Skip if paused
     timeRemaining--;
     questionTimes[currentQ]++;
     updateTimerDisplay();
@@ -1328,7 +1329,6 @@ function goToQuestion(idx) {
   currentQ = idx;
   renderQuestion();
   scrollToTop();
-  closeNavigator();
 }
 
 function scrollToTop() {
@@ -1368,26 +1368,43 @@ function updateQuestionMap() {
 }
 
 // ============================================================
-//  NAVIGATOR MODAL
+//  PAUSE FUNCTION
 // ============================================================
-function openNavigator() {
-  const grid = document.getElementById('navGrid');
-  grid.innerHTML = '';
-  TEST_DATA.questions.forEach((q, i) => {
-    const cell = document.createElement('div');
-    cell.className = 'nav-cell';
-    if (i === currentQ) cell.classList.add('current');
-    else if (answers[i] !== null) cell.classList.add('answered');
-    if (flags[i]) cell.classList.add('flagged-cell');
-    cell.textContent = q.id;
-    cell.onclick = () => goToQuestion(i);
-    grid.appendChild(cell);
-  });
-  document.getElementById('navModal').classList.add('show');
+function togglePause() {
+  isPaused = !isPaused;
+  const pauseBtn = document.getElementById('pauseBtn');
+  
+  if (isPaused) {
+    pauseBtn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg> Resume`;
+    pauseBtn.style.background = 'var(--green)';
+    pauseBtn.style.color = '#fff';
+  } else {
+    pauseBtn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Pause`;
+    pauseBtn.style.background = '';
+    pauseBtn.style.color = '';
+  }
 }
 
-function closeNavigator() {
-  document.getElementById('navModal').classList.remove('show');
+// ============================================================
+//  MOBILE TAB SWITCHING
+// ============================================================
+function showMobileTab(tab) {
+  const leftPanel = document.querySelector('.left-panel');
+  const rightPanel = document.querySelector('.right-panel');
+  const tabPassage = document.getElementById('tabPassage');
+  const tabQuestion = document.getElementById('tabQuestion');
+  
+  if (tab === 'passage') {
+    leftPanel.classList.add('mobile-hidden');
+    rightPanel.classList.add('mobile-visible');
+    tabPassage.classList.add('active');
+    tabQuestion.classList.remove('active');
+  } else {
+    leftPanel.classList.remove('mobile-hidden');
+    rightPanel.classList.remove('mobile-visible');
+    tabPassage.classList.remove('active');
+    tabQuestion.classList.add('active');
+  }
 }
 
 // ============================================================
@@ -1463,7 +1480,7 @@ function setupKeyboard() {
     else if (key === 'arrowright' || key === 'n') nextQuestion();
     else if (key === 'arrowleft' || key === 'p') prevQuestion();
     else if (key === 'f') toggleFlag();
-    else if (key === 'escape') { closeNavigator(); closeSubmitModal(); }
+    else if (key === 'escape') { closeSubmitModal(); }
   });
 }
 
@@ -1513,9 +1530,6 @@ function setupResize() {
 }
 
 // Close modals on overlay click
-document.getElementById('navModal').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('navModal')) closeNavigator();
-});
 document.getElementById('submitModal').addEventListener('click', (e) => {
   if (e.target === document.getElementById('submitModal')) closeSubmitModal();
 });
