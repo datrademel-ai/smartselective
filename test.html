@@ -246,6 +246,7 @@ html, body {
   background: var(--bg-primary);
   order: -1;
   border-right: 1px solid var(--border);
+  transition: width 0.3s ease, min-width 0.3s ease, max-width 0.3s ease, opacity 0.3s ease;
 }
 
 /* LEFT PANEL (now visually RIGHT) — Question + Options */
@@ -262,6 +263,8 @@ html, body {
   max-width: 0;
   overflow: hidden;
   border: none;
+  opacity: 0;
+  transition: width 0.3s ease, min-width 0.3s ease, max-width 0.3s ease, opacity 0.3s ease;
 }
 
 /* Resize handle */
@@ -1270,19 +1273,33 @@ function renderQuestion() {
 function renderPassage(q) {
   const content = document.getElementById('passageContent');
   const label = document.getElementById('passageLabel');
+  const rightPanel = document.getElementById('rightPanel');
+  const resizeHandle = document.getElementById('resizeHandle');
 
-  if (q.passage) {
+  // Check if this is a Reading subject (case-insensitive)
+  const isReadingSubject = q.subject.toLowerCase().includes('reading');
+
+  if (isReadingSubject && q.passage) {
+    // Reading with passage - show panel
     content.innerHTML = `<div class="passage-label">${q.subject}</div>${q.passage}`;
     content.style.fontSize = passageFontSize + 'px';
     label.textContent = 'Reading Passage';
-    document.getElementById('rightPanel').classList.remove('collapsed');
-  } else {
+    rightPanel.classList.remove('collapsed');
+    if (resizeHandle) resizeHandle.style.display = 'block';
+  } else if (isReadingSubject && !q.passage) {
+    // Reading without passage - show "No passage" message
     content.innerHTML = `<div class="no-passage">
       <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
       <p>No passage for this question</p>
       <p style="font-size:12px;margin-top:4px">This is a standalone ${q.subject} question</p>
     </div>`;
     label.textContent = q.subject;
+    rightPanel.classList.remove('collapsed');
+    if (resizeHandle) resizeHandle.style.display = 'block';
+  } else {
+    // Non-reading subjects (Verbal, Numerical, Mathematics) - HIDE panel completely
+    rightPanel.classList.add('collapsed');
+    if (resizeHandle) resizeHandle.style.display = 'none';
   }
 }
 
