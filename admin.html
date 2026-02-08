@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - SmartSelective</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #1a202c;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .logo span {
+            color: #3b82f6;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .admin-badge {
+            background: #fbbf24;
+            color: #78350f;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .back-btn {
+            background: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+        
+        .back-btn:hover {
+            background: #2563eb;
+        }
+        
+        /* Layout */
+        .container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            padding: 2rem 0;
+        }
+        
+        .sidebar nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .sidebar nav a:hover {
+            background: #f1f5f9;
+            color: #3b82f6;
+        }
+        
+        .sidebar nav a.active {
+            background: #eff6ff;
+            color: #3b82f6;
+            border-right: 3px solid #3b82f6;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+        
+        .page-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+        
+        /* Content Card */
+        .content-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .content-card h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table thead {
+            background: #f8f9fa;
+        }
+        
+        .data-table th {
+            padding: 0.75rem;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .data-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.875rem;
+        }
+        
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        /* Form */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.625rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 0.75rem 1rem;
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab:hover {
+            color: #3b82f6;
+        }
+        
+        .tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        /* Alert */
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+        
+        .alert.show {
+            display: block;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            padding: 0.375rem 0.75rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            Smart<span>Selective</span>
+        </div>
+        <div class="header-right">
+            <span class="admin-badge">ADMIN</span>
+            <span id="adminEmail">admin@example.com</span>
+            <a href="/dashboard.html" class="back-btn">← Back to Dashboard</a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav>
+                <a href="#overview" class="nav-link active" data-page="overview">
+                    📊 Overview
+                </a>
+                <a href="#questions" class="nav-link" data-page="questions">
+                    📝 Questions
+                </a>
+                <a href="#tests" class="nav-link" data-page="tests">
+                    🧪 Tests
+                </a>
+                <a href="#users" class="nav-link" data-page="users">
+                    👥 Users
+                </a>
+                <a href="#backup" class="nav-link" data-page="backup">
+                    💾 Backup
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div id="alertContainer"></div>
+
+            <!-- Overview Page -->
+            <div id="overview-page" class="page-content">
+                <h1 class="page-title">Admin Overview</h1>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Questions</h3>
+                        <div class="value" id="totalQuestions">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Tests</h3>
+                        <div class="value" id="activeTests">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Users</h3>
+                        <div class="value" id="totalUsers">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Subscriptions</h3>
+                        <div class="value" id="activeSubscriptions">0</div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h2>Quick Actions</h2>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="showPage('questions')">Add Questions</button>
+                        <button class="btn btn-primary" onclick="showPage('tests')">Create Test</button>
+                        <button class="btn btn-secondary" onclick="showPage('backup')">Backup Data</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questions Page -->
+            <div id="questions-page" class="page-content hidden">
+                <h1 class="page-title">Question Management</h1>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab('add-question')">Add Question</button>
+                    <button class="tab" onclick="showTab('import-questions')">Import JSON</button>
+                    <button class="tab" onclick="showTab('view-questions')">View All</button>
+                </div>
+
+                <!-- Add Question Tab -->
+                <div id="add-question-tab" class="tab-content active">
+                    <div class="content-card">
+                        <h2>Add New Question</h2>
+                        <form id="addQuestionForm">
+                            <div class="form-group">
+                                <label>Subject *</label>
+                                <select id="questionSubject" required>
+                                    <option value="">Select subject</option>
+                                    <option value="reading">Reading Comprehension</option>
+                                    <option value="math">Mathematics</option>
+                                    <option value="verbal">Verbal Reasoning</option>
+                                    <option value="quantitative">Quantitative Reasoning</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Question Text *</label>
+                                <textarea id="questionText" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Option A *</label>
+                                <input type="text" id="optionA" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Option B *</label>
+                                <input type="text" id="optionB" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Option C *</label>
+                                <input type="text" id="optionC" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Option D *</label>
+                                <input type="text" id="optionD" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Correct Answer *</label>
+                                <select id="correctAnswer" required>
+                                    <option value="">Select correct answer</option>
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="C">C</option>
+                                    <option value="D">D</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Explanation</label>
+                                <textarea id="explanation"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Difficulty</label>
+                                <select id="difficulty">
+                                    <option value="easy">Easy</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="hard">Hard</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Question</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Import JSON Tab -->
+                <div id="import-questions-tab" class="tab-content">
+                    <div class="content-card">
+                        <h2>Import Questions from JSON</h2>
+                        <div class="form-group">
+                            <label>Upload JSON File</label>
+                            <input type="file" id="jsonFile" accept=".json">
+                        </div>
+                        <button class="btn btn-primary" onclick="importJSON()">Import Questions</button>
+                        
+                        <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 0.5rem;">
+                            <h3 style="margin-bottom: 0.5rem;">JSON Format Example:</h3>
+                            <pre style="font-size: 0.75rem; overflow-x: auto;">[
+  {
+    "subject": "reading",
+    "question_text": "What is the main idea?",
+    "options": {"A": "Option 1", "B": "Option 2", "C": "Option 3", "D": "Option 4"},
+    "correct_answer": "A",
+    "explanation": "Explanation here",
+    "difficulty_level": "medium"
+  }
+]</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View Questions Tab -->
+                <div id="view-questions-tab" class="tab-content">
+                    <div class="content-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h2>All Questions</h2>
+                            <div>
+                                <select id="filterSubject" onchange="loadQuestions()">
+                                    <option value="">All Subjects</option>
+                                    <option value="reading">Reading</option>
+                                    <option value="math">Math</option>
+                                    <option value="verbal">Verbal</option>
+                                    <option value="quantitative">Quantitative</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="questionsList" class="loading">Loading questions...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tests Page -->
+            <div id="tests-page" class="page-content hidden">
+                <h1 class="page-title">Test Management</h1>
+                
+                <div class="content-card">
+                    <h2>Create Weekly Test</h2>
+                    <form id="createTestForm">
+                        <div class="form-group">
+                            <label>Week Number</label>
+                            <input type="number" id="weekNumber" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Start Date (Tuesday)</label>
+                            <input type="date" id="startDate" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Generate Test</button>
+                    </form>
+                </div>
+
+                <div class="content-card">
+                    <h2>Active Tests</h2>
+                    <div id="testsList" class="loading">Loading tests...</div>
+                </div>
+            </div>
+
+            <!-- Users Page -->
+            <div id="users-page" class="page-content hidden">
+                <h1 class="page-title">User Management</h1>
+                
+                <div class="content-card">
+                    <h2>All Users</h2>
+                    <div id="usersList" class="loading">Loading users...</div>
+                </div>
+            </div>
+
+            <!-- Backup Page -->
+            <div id="backup-page" class="page-content hidden">
+                <h1 class="page-title">Backup & Restore</h1>
+                
+                <div class="content-card">
+                    <h2>Backup Questions</h2>
+                    <p style="margin-bottom: 1rem; color: #64748b;">Download all questions as JSON file</p>
+                    <button class="btn btn-success" onclick="backupQuestions()">Download Backup</button>
+                </div>
+
+                <div class="content-card">
+                    <h2>Database Statistics</h2>
+                    <table class="data-table">
+                        <tbody>
+                            <tr>
+                                <td>Total Questions</td>
+                                <td id="backupQuestionsCount">-</td>
+                            </tr>
+                            <tr>
+                                <td>Total Users</td>
+                                <td id="backupUsersCount">-</td>
+                            </tr>
+                            <tr>
+                                <td>Total Test Attempts</td>
+                                <td id="backupAttemptsCount">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+    (function() {
+        // Supabase initialization
+        const sb = window.supabase.createClient(
+            'https://qsowtakfotypsrkfanlw.supabase.co',
+            'sb_publishable_Byg3sZUa0AzxVuyPEhY8GQ_3GGOidrj'
+        );
+        
+        // Check admin access
+        async function checkAdminAccess() {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) {
+                window.location.href = '/login.html';
+                return false;
+            }
+            
+            const { data: userData } = await sb
+                .from('users')
+                .select('is_admin, email')
+                .eq('id', session.user.id)
+                .single();
+            
+            if (!userData || !userData.is_admin) {
+                alert('Access denied. Admin privileges required.');
+                window.location.href = '/dashboard.html';
+                return false;
+            }
+            
+            document.getElementById('adminEmail').textContent = userData.email;
+            return true;
+        }
+        
+        // Navigation
+        window.showPage = function(pageName) {
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.add('hidden');
+            });
+            document.getElementById(pageName + '-page').classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`[data-page="${pageName}"]`).classList.add('active');
+            
+            if (pageName === 'questions') loadQuestions();
+            if (pageName === 'tests') loadTests();
+            if (pageName === 'users') loadUsers();
+            if (pageName === 'backup') loadBackupStats();
+        };
+        
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage(link.dataset.page);
+            });
+        });
+        
+        // Tabs
+        window.showTab = function(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        };
+        
+        // Alert
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} show`;
+            alertDiv.textContent = message;
+            document.getElementById('alertContainer').appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+        
+        // Load overview stats
+        async function loadOverviewStats() {
+            const { count: questionsCount } = await sb.from('questions').select('*', { count: 'exact', head: true });
+            const { count: testsCount } = await sb.from('weekly_tests').select('*', { count: 'exact', head: true }).eq('is_active', true);
+            const { count: usersCount } = await sb.from('users').select('*', { count: 'exact', head: true });
+            
+            document.getElementById('totalQuestions').textContent = questionsCount || 0;
+            document.getElementById('activeTests').textContent = testsCount || 0;
+            document.getElementById('totalUsers').textContent = usersCount || 0;
+            document.getElementById('activeSubscriptions').textContent = '0';
+        }
+        
+        // Add question
+        document.getElementById('addQuestionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const questionData = {
+                subject: document.getElementById('questionSubject').value,
+                question_text: document.getElementById('questionText').value,
+                options: {
+                    A: document.getElementById('optionA').value,
+                    B: document.getElementById('optionB').value,
+                    C: document.getElementById('optionC').value,
+                    D: document.getElementById('optionD').value
+                },
+                correct_answer: document.getElementById('correctAnswer').value,
+                explanation: document.getElementById('explanation').value,
+                difficulty_level: document.getElementById('difficulty').value
+            };
+            
+            const { error } = await sb.from('questions').insert([questionData]);
+            
+            if (error) {
+                showAlert('Error adding question: ' + error.message, 'error');
+            } else {
+                showAlert('Question added successfully!');
+                document.getElementById('addQuestionForm').reset();
+                loadOverviewStats();
+            }
+        });
+        
+        // Load questions
+        window.loadQuestions = async function() {
+            const subject = document.getElementById('filterSubject').value;
+            let query = sb.from('questions').select('*').order('created_at', { ascending: false });
+            
+            if (subject) {
+                query = query.eq('subject', subject);
+            }
+            
+            const { data: questions, error } = await query;
+            
+            const listDiv = document.getElementById('questionsList');
+            if (error || !questions || questions.length === 0) {
+                listDiv.innerHTML = '<p style="text-align:center;color:#64748b;">No questions found</p>';
+                return;
+            }
+            
+            listDiv.innerHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Question</th>
+                            <th>Difficulty</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${questions.map(q => `
+                            <tr>
+                                <td><span class="badge badge-info">${q.subject}</span></td>
+                                <td>${q.question_text.substring(0, 50)}...</td>
+                                <td><span class="badge badge-${q.difficulty_level === 'hard' ? 'danger' : q.difficulty_level === 'medium' ? 'warning' : 'success'}">${q.difficulty_level}</span></td>
+                                <td class="actions">
+                                    <button class="action-btn btn-danger" onclick="deleteQuestion('${q.id}')">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        };
+        
+        // Delete question
+        window.deleteQuestion = async function(id) {
+            if (!confirm('Delete this question?')) return;
+            
+            const { error } = await sb.from('questions').delete().eq('id', id);
+            
+            if (error) {
+                showAlert('Error deleting question: ' + error.message, 'error');
+            } else {
+                showAlert('Question deleted!');
+                loadQuestions();
+                loadOverviewStats();
+            }
+        };
+        
+        // Import JSON
+        window.importJSON = async function() {
+            const fileInput = document.getElementById('jsonFile');
+            if (!fileInput.files[0]) {
+                showAlert('Please select a file', 'error');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = async (e) => {
+                try {
+                    const questions = JSON.parse(e.target.result);
+                    const { error } = await sb.from('questions').insert(questions);
+                    
+                    if (error) {
+                        showAlert('Error importing: ' + error.message, 'error');
+                    } else {
+                        showAlert(`Successfully imported ${questions.length} questions!`);
+                        fileInput.value = '';
+                        loadOverviewStats();
+                    }
+                } catch (err) {
+                    showAlert('Invalid JSON file', 'error');
+                }
+            };
+            
+            reader.readAsText(file);
+        };
+        
+        // Load tests
+        window.loadTests = async function() {
+            const { data: tests, error } = await sb.from('weekly_tests').select('*').order('week_number', { ascending: false });
+            
+            const listDiv = document.getElementById('testsList');
+            if (error || !tests || tests.length === 0) {
+                listDiv.innerHTML = '<p style="text-align:center;color:#64748b;">No tests found</p>';
+                return;
+            }
+            
+            listDiv.innerHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Week</th>
+                            <th>Date Range</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tests.map(t => `
+                            <tr>
+                                <td>Week ${t.week_number}</td>
+                                <td>${new Date(t.week_start_date).toLocaleDateString()} - ${new Date(t.week_end_date).toLocaleDateString()}</td>
+                                <td><span class="badge badge-${t.is_active ? 'success' : 'danger'}">${t.is_active ? 'Active' : 'Inactive'}</span></td>
+                                <td class="actions">
+                                    <button class="action-btn btn-${t.is_active ? 'danger' : 'success'}" onclick="toggleTest('${t.id}', ${!t.is_active})">${t.is_active ? 'Deactivate' : 'Activate'}</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        };
+        
+        // Toggle test
+        window.toggleTest = async function(id, isActive) {
+            const { error } = await sb.from('weekly_tests').update({ is_active: isActive }).eq('id', id);
+            
+            if (error) {
+                showAlert('Error updating test: ' + error.message, 'error');
+            } else {
+                showAlert('Test updated!');
+                loadTests();
+                loadOverviewStats();
+            }
+        };
+        
+        // Load users
+        window.loadUsers = async function() {
+            const { data: users, error } = await sb.from('users').select('*').order('created_at', { ascending: false });
+            
+            const listDiv = document.getElementById('usersList');
+            if (error || !users || users.length === 0) {
+                listDiv.innerHTML = '<p style="text-align:center;color:#64748b;">No users found</p>';
+                return;
+            }
+            
+            listDiv.innerHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Name</th>
+                            <th>Admin</th>
+                            <th>Active</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${users.map(u => `
+                            <tr>
+                                <td>${u.email || '-'}</td>
+                                <td>${u.student_name || '-'}</td>
+                                <td><span class="badge badge-${u.is_admin ? 'success' : 'secondary'}">${u.is_admin ? 'Yes' : 'No'}</span></td>
+                                <td><span class="badge badge-${u.is_active ? 'success' : 'danger'}">${u.is_active ? 'Active' : 'Inactive'}</span></td>
+                                <td>${new Date(u.created_at).toLocaleDateString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        };
+        
+        // Backup questions
+        window.backupQuestions = async function() {
+            const { data: questions } = await sb.from('questions').select('*');
+            
+            const dataStr = JSON.stringify(questions, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `questions-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            
+            showAlert('Backup downloaded!');
+        };
+        
+        // Load backup stats
+        window.loadBackupStats = async function() {
+            const { count: questionsCount } = await sb.from('questions').select('*', { count: 'exact', head: true });
+            const { count: usersCount } = await sb.from('users').select('*', { count: 'exact', head: true });
+            const { count: attemptsCount } = await sb.from('test_attempts').select('*', { count: 'exact', head: true });
+            
+            document.getElementById('backupQuestionsCount').textContent = questionsCount || 0;
+            document.getElementById('backupUsersCount').textContent = usersCount || 0;
+            document.getElementById('backupAttemptsCount').textContent = attemptsCount || 0;
+        };
+        
+        // Initialize
+        checkAdminAccess().then(hasAccess => {
+            if (hasAccess) {
+                loadOverviewStats();
+            }
+        });
+    })();
+    </script>
+</body>
+</html>
