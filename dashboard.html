@@ -482,7 +482,7 @@ async function rAdmin(el) {
             }
             if (t) {
                 h += '<button class="aqb" style="background:var(--blue-p);color:var(--blue)" onclick="SS.viewQs(\'' + t.id + '\',\'' + sj.id + '\')">View Q\'s</button>';
-                if (!t.is_published) h += '<button class="aqb" style="background:var(--red-p);color:var(--red)" onclick="SS.delTest(\'' + t.id + '\',\'' + sj.title + '\')">Delete</button>';
+                h += '<button class="aqb" style="background:var(--red-p);color:var(--red)" onclick="SS.delTest(\'' + t.id + '\',\'' + sj.title + '\',' + t.is_published + ')">Delete</button>';
             }
             h += '</div></div></div>';
         }
@@ -718,8 +718,15 @@ SS.delQ = function(qId, testId, subjectId) {
     });
 };
 
-SS.delTest = function(testId, title) {
-    showCf('Delete ' + title + '?', 'All questions in this test will be permanently deleted.', async function() {
+SS.delTest = function(testId, title, isPublished) {
+    var warning = isPublished 
+        ? '⚠️ This test is PUBLISHED. Students may have already taken it. All questions and student attempts will be permanently deleted.'
+        : 'All questions in this test will be permanently deleted.';
+    showCf('Delete ' + title + '?', warning, async function() {
+        // Delete related attempts first if published
+        if (isPublished) {
+            await SB.from('test_attempts').delete().eq('test_id', testId);
+        }
         await SB.from('questions').delete().eq('test_id', testId);
         await SB.from('weekly_tests').delete().eq('id', testId);
         toast(title + ' deleted.');
