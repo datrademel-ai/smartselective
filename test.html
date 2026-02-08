@@ -1268,6 +1268,20 @@ function renderQuestion() {
   // Prev/Next button states
   document.getElementById('prevBtn').style.opacity = currentQ === 0 ? '0.4' : '1';
   document.getElementById('prevBtn').style.pointerEvents = currentQ === 0 ? 'none' : 'auto';
+  
+  // 마지막 문제일 때 Next 버튼 숨기고 Submit 버튼으로 대체
+  const nextBtn = document.getElementById('nextBtn');
+  const isLastQuestion = currentQ === TEST_DATA.questions.length - 1;
+  
+  if (isLastQuestion) {
+    nextBtn.innerHTML = `Submit <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
+    nextBtn.onclick = openSubmitModal;
+    nextBtn.style.background = 'var(--green)';
+  } else {
+    nextBtn.innerHTML = `Next <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>`;
+    nextBtn.onclick = nextQuestion;
+    nextBtn.style.background = '';
+  }
 }
 
 function renderPassage(q) {
@@ -1448,35 +1462,119 @@ function closeSubmitModal() {
 
 async function submitTest() {
   clearInterval(timerInterval);
-
-  // Calculate time spent
-  const totalTimeSpent = Math.floor((Date.now() - testStartTime) / 1000);
-
-  // Build results object compatible with results.html
-  const results = {
-    testId: TEST_DATA.testId,
-    testName: TEST_DATA.testName,
-    totalQuestions: TEST_DATA.questions.length,
-    timeLimit: TEST_DATA.timeLimit,
-    timeSpent: totalTimeSpent,
-    subjects: [TEST_DATA.subjectConfig],
-    questions: TEST_DATA.questions.map((q, i) => ({
-      ...q,
-      userAnswer: answers[i],
-      timeSpent: questionTimes[i]
-    }))
-  };
-
-  // Save to localStorage for results page
-  localStorage.setItem('smartselective_results', JSON.stringify(results));
   
-  // Redirect to results
-  window.location.href = 'results.html';
+  // 제출 버튼 비활성화 (중복 클릭 방지)
+  const submitBtn = document.querySelector('.modal-btn-submit');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+  }
+
+  try {
+    // 현재 로그인한 사용자 확인
+    const { data: { session } } = await SB.auth.getSession();
+    if (!session) {
+      alert('Session expired. Please log in again.');
+      window.location.href = '/login.html';
+      return;
+    }
+    const userId = session.user.id;
+
+    // 점수 계산
+    let correctCount = 0;
+    TEST_DATA.questions.forEach((q, i) => {
+      if (answers[i] === q.correctAnswer) {
+        correctCount++;
+      }
+    });
+    
+    const totalQuestions = TEST_DATA.questions.length;
+    const scorePercent = Math.round((correctCount / totalQuestions) * 100);
+    const totalTimeSpent = Math.floor((Date.now() - testStartTime) / 1000);
+
+    // answers 배열을 객체로 변환 (Supabase 저장용)
+    const answersObj = {};
+    answers.forEach((ans, i) => {
+      answersObj[String(i)] = ans;
+    });
+
+    // 현재 주차 계산
+    const now = new Date();
+    const ep = new Date(2025, 0, 6);
+    const df = Math.floor((now - ep) / 86400000);
+    const wn = Math.floor(df / 7) + 1;
+    const weekKey = 'w' + wn + '_' + now.getFullYear();
+
+    // 기존 attempt 찾기 또는 새로 생성
+    const { data: existingAttempt } = await SB
+      .from('test_attempts')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('test_id', TEST_DATA.testId)
+      .single();
+
+    let attemptId;
+    
+    if (existingAttempt) {
+      // 기존 attempt 업데이트
+      const { error: updateError } = await SB
+        .from('test_attempts')
+        .update({
+          status: 'completed',
+          score: correctCount,
+          total_questions: totalQuestions,
+          score_percent: scorePercent,
+          time_used_seconds: totalTimeSpent,
+          answers: answersObj,
+          completed_at: new Date().toISOString()
+        })
+        .eq('id', existingAttempt.id);
+      
+      if (updateError) throw updateError;
+      attemptId = existingAttempt.id;
+    } else {
+      // 새 attempt 생성
+      const { data: newAttempt, error: insertError } = await SB
+        .from('test_attempts')
+        .insert({
+          user_id: userId,
+          test_id: TEST_DATA.testId,
+          week_key: weekKey,
+          status: 'completed',
+          score: correctCount,
+          total_questions: totalQuestions,
+          score_percent: scorePercent,
+          time_used_seconds: totalTimeSpent,
+          answers: answersObj,
+          current_question: currentQ,
+          time_remaining_seconds: 0,
+          completed_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+      
+      if (insertError) throw insertError;
+      attemptId = newAttempt.id;
+    }
+
+    // 결과 페이지로 이동 (attempt_id 포함)
+    window.location.href = '/results?attempt_id=' + attemptId;
+    
+  } catch (error) {
+    console.error('Submit error:', error);
+    alert('Error submitting test: ' + error.message + '\n\nPlease try again.');
+    
+    // 버튼 다시 활성화
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Test';
+    }
+  }
 }
 
-function autoSubmit() {
+async function autoSubmit() {
   alert('⏰ Time is up! Your test will be submitted automatically.');
-  submitTest();
+  await submitTest();
 }
 
 // ============================================================
