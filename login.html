@@ -4,106 +4,196 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - SmartSelective</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,600;6..72,700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f9fafb; color: #333; }
-        nav { background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 1rem 0; }
-        nav .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
-        nav .logo { font-size: 1.5rem; font-weight: bold; color: #2563eb; text-decoration: none; }
-        .login-section { padding: 4rem 0; min-height: calc(100vh - 200px); }
-        .login-container { max-width: 450px; margin: 0 auto; background: white; border-radius: 12px; padding: 3rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .login-header { text-align: center; margin-bottom: 2rem; }
-        .login-header h1 { font-size: 2rem; color: #2563eb; margin-bottom: 0.5rem; }
-        .login-header p { color: #6b7280; }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-        .form-group input { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
-        .form-group input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-        .forgot-password { text-align: right; margin-bottom: 1.5rem; }
-        .forgot-password a { color: #2563eb; text-decoration: none; font-size: 0.875rem; }
-        .submit-btn { width: 100%; padding: 1rem; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1.125rem; font-weight: 600; cursor: pointer; }
-        .submit-btn:hover { background: #1d4ed8; }
-        .submit-btn:disabled { background: #9ca3af; cursor: not-allowed; }
-        .signup-link { text-align: center; margin-top: 2rem; color: #6b7280; }
-        .signup-link a { color: #2563eb; text-decoration: none; font-weight: 500; }
-        .error-message { background: #fee; border: 1px solid #fcc; color: #c00; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; display: none; }
-        .success-message { background: #efe; border: 1px solid #cfc; color: #060; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; display: none; }
+:root{--navy:#0f172a;--blue:#2563eb;--blue-l:#3b82f6;--blue-p:#dbeafe;--blue-g:#eff6ff;--green:#059669;--green-p:#d1fae5;--red:#dc2626;--red-p:#fee2e2;--bg:#f8fafc;--card:#fff;--tx:#0f172a;--tx2:#475569;--tx3:#94a3b8;--bdr:#e2e8f0;--sh:0 4px 24px rgba(0,0,0,.08);--r:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column}
+h1,h2{font-family:'Newsreader',serif}
+.hdr{background:var(--card);border-bottom:1px solid var(--bdr);padding:1rem 0}
+.hdr-i{max-width:1200px;margin:0 auto;padding:0 1.5rem;display:flex;justify-content:space-between;align-items:center}
+.logo{font-family:'Newsreader',serif;font-size:1.5rem;font-weight:700;color:var(--navy);text-decoration:none}
+.logo em{font-style:normal;color:var(--blue)}
+.hdr-nav{display:flex;gap:1.5rem;align-items:center}
+.hdr-nav a{font-size:.875rem;color:var(--tx2);text-decoration:none;font-weight:500}
+.hdr-nav a:hover{color:var(--blue)}
+.btn-s{background:var(--blue);color:#fff;padding:.5rem 1.25rem;border-radius:8px;font-weight:600;font-size:.875rem}
+.btn-s:hover{background:var(--navy)}
+.main{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:2.5rem;width:100%;max-width:420px}
+.card h1{font-size:1.75rem;margin-bottom:.5rem;text-align:center}
+.card p{color:var(--tx2);font-size:.9375rem;text-align:center;margin-bottom:1.75rem}
+.fg{margin-bottom:1.25rem}
+.fg label{display:block;font-size:.8125rem;font-weight:600;color:var(--tx);margin-bottom:.4rem}
+.fg input{width:100%;padding:.75rem 1rem;border:1px solid var(--bdr);border-radius:8px;font-family:inherit;font-size:.9375rem;transition:.15s}
+.fg input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-p)}
+.btn{width:100%;padding:.875rem;background:var(--blue);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:1rem;font-weight:600;cursor:pointer;transition:.15s}
+.btn:hover{background:var(--navy)}
+.btn:disabled{background:var(--bdr);cursor:not-allowed}
+.divider{display:flex;align-items:center;gap:1rem;margin:1.5rem 0;color:var(--tx3);font-size:.8125rem}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.link{text-align:center;margin-top:1.5rem;font-size:.875rem;color:var(--tx2)}
+.link a{color:var(--blue);font-weight:600;text-decoration:none}
+.link a:hover{text-decoration:underline}
+.alert{padding:.875rem 1rem;border-radius:8px;font-size:.8125rem;margin-bottom:1.25rem;display:none}
+.alert-e{background:var(--red-p);color:var(--red);border:1px solid #fecaca}
+.alert-s{background:var(--green-p);color:var(--green);border:1px solid #a7f3d0}
+.ftr{text-align:center;padding:1.5rem;color:var(--tx3);font-size:.8125rem;border-top:1px solid var(--bdr)}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin-right:.5rem}
+@keyframes spin{to{transform:rotate(360deg)}}
     </style>
 </head>
 <body>
-    <nav><div class="container"><a href="/" class="logo">SmartSelective</a></div></nav>
+<header class="hdr">
+    <div class="hdr-i">
+        <a href="/" class="logo">Smart<em>Selective</em></a>
+        <nav class="hdr-nav">
+            <a href="/pricing.html">Pricing</a>
+            <a href="/signup.html" class="btn-s">Sign Up</a>
+        </nav>
+    </div>
+</header>
 
-    <section class="login-section">
-        <div class="container">
-            <div class="login-container">
-                <div class="login-header">
-                    <h1>Welcome Back</h1>
-                    <p>Log in to continue your preparation</p>
-                </div>
-                <div id="errorMessage" class="error-message"></div>
-                <div id="successMessage" class="success-message"></div>
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" required placeholder="your.email@example.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" required placeholder="Enter your password">
-                    </div>
-                    <div class="forgot-password">
-                        <a href="/reset-password.html">Forgot Password?</a>
-                    </div>
-                    <button type="submit" class="submit-btn" id="submitBtn">Log In</button>
-                </form>
-                <div class="signup-link">
-                    Don't have an account? <a href="/signup.html">Sign Up</a>
-                </div>
+<main class="main">
+    <div class="card">
+        <h1>Welcome Back</h1>
+        <p>Log in to continue your test preparation</p>
+        
+        <div class="alert alert-e" id="alertE"></div>
+        <div class="alert alert-s" id="alertS"></div>
+        
+        <form id="loginForm">
+            <div class="fg">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">
             </div>
+            <div class="fg">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn" id="submitBtn">Log In</button>
+        </form>
+        
+        <div class="link">
+            Don't have an account? <a href="/signup.html">Sign up</a>
         </div>
-    </section>
+    </div>
+</main>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-    (function() {
-        var sb = window.supabase.createClient(
-            'https://qeowtqkfotypsrkfaniw.supabase.co',
-            'sb_publishable_Byg3sZUa0AzxVuyPEhY8GQ_3GGOidrj'
-        );
+<footer class="ftr">
+    © 2026 SmartSelective. Prepare smarter, score higher.
+</footer>
 
-        sb.auth.getSession().then(function(result) {
-            if (result.data.session) {
-                window.location.href = '/dashboard.html';
-            }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function() {
+'use strict';
+
+var SB = window.supabase.createClient(
+    'https://qeowtqkfotypsrkfaniw.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlb3d0cWtmb3R5cHNya2Zhbml3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxNDUwNjYsImV4cCI6MjA4NTcyMTA2Nn0.Og5eSoXdP-5hSEC1CnH1jYZ8BiscaL9Ah5KhQhaO0eA'
+);
+
+var form = document.getElementById('loginForm');
+var btn = document.getElementById('submitBtn');
+var alertE = document.getElementById('alertE');
+var alertS = document.getElementById('alertS');
+
+function showError(msg) {
+    alertE.textContent = msg;
+    alertE.style.display = 'block';
+    alertS.style.display = 'none';
+}
+
+function showSuccess(msg) {
+    alertS.textContent = msg;
+    alertS.style.display = 'block';
+    alertE.style.display = 'none';
+}
+
+function setLoading(loading) {
+    btn.disabled = loading;
+    btn.innerHTML = loading ? '<span class="spinner"></span>Logging in...' : 'Log In';
+}
+
+// 이미 로그인되어 있으면 대시보드로 리다이렉트
+SB.auth.getSession().then(function(r) {
+    if (r.data.session) {
+        window.location.href = '/dashboard.html';
+    }
+});
+
+form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    var email = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
+    
+    if (!email || !password) {
+        showError('Please enter email and password.');
+        return;
+    }
+    
+    setLoading(true);
+    alertE.style.display = 'none';
+    alertS.style.display = 'none';
+    
+    try {
+        // Supabase 로그인
+        var { data, error } = await SB.auth.signInWithPassword({
+            email: email,
+            password: password
         });
-
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            var errorDiv = document.getElementById('errorMessage');
-            var successDiv = document.getElementById('successMessage');
-            var submitBtn = document.getElementById('submitBtn');
-            var email = document.getElementById('email').value;
-            var password = document.getElementById('password').value;
-
-            errorDiv.style.display = 'none';
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Logging in...';
-
-            try {
-                var result = await sb.auth.signInWithPassword({ email: email, password: password });
-                if (result.error) throw result.error;
-
-                successDiv.textContent = 'Login successful! Redirecting...';
-                successDiv.style.display = 'block';
-                setTimeout(function() { window.location.href = '/dashboard.html'; }, 1000);
-            } catch (err) {
-                errorDiv.textContent = err.message || 'Invalid email or password.';
-                errorDiv.style.display = 'block';
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Log In';
+        
+        if (error) throw error;
+        
+        // ============================================================
+        // 단일 기기 로그인: 세션 ID 생성 및 저장
+        // ============================================================
+        var sessionId = crypto.randomUUID();
+        
+        // DB에 세션 ID 저장
+        var { error: updateError } = await SB.from('profiles')
+            .update({ 
+                active_session_id: sessionId,
+                last_active: new Date().toISOString()
+            })
+            .eq('id', data.user.id);
+        
+        if (updateError) {
+            console.error('Session update error:', updateError);
+            // 에러가 있어도 로그인은 진행 (graceful degradation)
+        }
+        
+        // localStorage에 세션 ID 저장
+        localStorage.setItem('ss_session_id', sessionId);
+        
+        showSuccess('Login successful! Redirecting...');
+        
+        setTimeout(function() {
+            window.location.href = '/dashboard.html';
+        }, 500);
+        
+    } catch (err) {
+        console.error('Login error:', err);
+        
+        var msg = 'Login failed. Please try again.';
+        if (err.message) {
+            if (err.message.includes('Invalid login credentials')) {
+                msg = 'Invalid email or password.';
+            } else if (err.message.includes('Email not confirmed')) {
+                msg = 'Please verify your email before logging in.';
+            } else {
+                msg = err.message;
             }
-        });
-    })();
-    </script>
+        }
+        
+        showError(msg);
+        setLoading(false);
+    }
+});
+
+})();
+</script>
 </body>
 </html>
