@@ -104,15 +104,21 @@ async function validateSession() {
         return false;
     }
     
-    // DB에서 현재 활성 세션 ID 확인
+    // DB에서 현재 활성 세션 ID 및 계정 상태 확인
     var { data: userData, error } = await SB.from('profiles')
-        .select('active_session_id')
+        .select('active_session_id, is_active')
         .eq('id', session.user.id)
         .single();
     
     if (error) {
         console.error('Session validation error:', error);
         return true; // DB 에러 시 일단 허용 (graceful degradation)
+    }
+    
+    // 계정 비활성화 체크
+    if (userData && userData.is_active === false) {
+        forceLogout('계정이 비활성화되었습니다. 관리자에게 문의하세요.');
+        return false;
     }
     
     // 세션 ID 불일치 = 다른 기기에서 로그인됨
@@ -520,8 +526,25 @@ async function rAdmin(el) {
         h += '</div>';
         h += '</div>';
     } else if (S.adView === 'students') {
-        // Students tab
+        // Students tab - 전체 관리 기능
         h += '<div class="card"><div class="ct">Student Management</div>';
+        // 검색 및 필터 UI
+        h += '<div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--bdr)">';
+        h += '<input type="text" id="stuSearch" class="afi" placeholder="🔍 Search by name or email..." style="flex:1;min-width:200px" oninput="SS.filterStudents()">';
+        h += '<select id="stuFilter" class="afs" style="width:auto;min-width:140px" onchange="SS.filterStudents()">';
+        h += '<option value="all">All Students</option>';
+        h += '<option value="active">✅ Active</option>';
+        h += '<option value="disabled">🚫 Disabled</option>';
+        h += '<option value="subscribed">💳 Subscribed</option>';
+        h += '<option value="unsubscribed">⏳ No Subscription</option>';
+        h += '</select>';
+        h += '<select id="stuSort" class="afs" style="width:auto;min-width:120px" onchange="SS.filterStudents()">';
+        h += '<option value="newest">Newest First</option>';
+        h += '<option value="oldest">Oldest First</option>';
+        h += '<option value="name">Name A-Z</option>';
+        h += '<option value="score">Highest Score</option>';
+        h += '</select>';
+        h += '</div>';
         h += '<div id="stuList"><div style="text-align:center;padding:1.5rem"><div class="spinner"></div></div></div>';
         h += '</div>';
     }
@@ -727,8 +750,12 @@ SS.pub = async function(testId) {
 };
 
 // ============================================================
-// STUDENT MANAGEMENT
+// STUDENT MANAGEMENT (확장)
 // ============================================================
+S.allStudents = [];  // 전체 학생 데이터 캐시
+S.allStudentAttempts = [];
+S.allStudentTests = [];
+
 SS.loadStudents = async function() {
     var el = document.getElementById('stuList');
     if (!el) return;
@@ -741,35 +768,145 @@ SS.loadStudents = async function() {
     // Load all tests for subject mapping
     var { data: allTests } = await SB.from('weekly_tests').select('id, subject, week_number');
 
-    var students = (profiles || []).filter(function(p) { return p.role !== 'admin'; });
-    var attempts = allAttempts || [];
-    var tests = allTests || [];
+    S.allStudents = (profiles || []).filter(function(p) { return p.role !== 'admin'; });
+    S.allStudentAttempts = allAttempts || [];
+    S.allStudentTests = allTests || [];
+
+    SS.renderStudents(S.allStudents);
+};
+
+SS.filterStudents = function() {
+    var search = (document.getElementById('stuSearch').value || '').toLowerCase().trim();
+    var filter = document.getElementById('stuFilter').value;
+    var sort = document.getElementById('stuSort').value;
+
+    var filtered = S.allStudents.filter(function(stu) {
+        // 검색 필터
+        var matchSearch = !search || 
+            (stu.display_name && stu.display_name.toLowerCase().includes(search)) ||
+            (stu.email && stu.email.toLowerCase().includes(search));
+        
+        // 상태 필터
+        var matchFilter = true;
+        if (filter === 'active') matchFilter = stu.is_active !== false;
+        else if (filter === 'disabled') matchFilter = stu.is_active === false;
+        else if (filter === 'subscribed') matchFilter = stu.subscription_status === 'active';
+        else if (filter === 'unsubscribed') matchFilter = stu.subscription_status !== 'active';
+        
+        return matchSearch && matchFilter;
+    });
+
+    // 정렬
+    filtered.sort(function(a, b) {
+        if (sort === 'oldest') return new Date(a.created_at) - new Date(b.created_at);
+        if (sort === 'name') return (a.display_name || a.email || '').localeCompare(b.display_name || b.email || '');
+        if (sort === 'score') {
+            var aScore = SS.getStudentAvgScore(a.id);
+            var bScore = SS.getStudentAvgScore(b.id);
+            return bScore - aScore;
+        }
+        return new Date(b.created_at) - new Date(a.created_at); // newest
+    });
+
+    SS.renderStudents(filtered);
+};
+
+SS.getStudentAvgScore = function(userId) {
+    var done = S.allStudentAttempts.filter(function(a) { 
+        return a.user_id === userId && (a.status === 'completed' || a.status === 'timed_out'); 
+    });
+    if (done.length === 0) return 0;
+    return Math.round(done.reduce(function(s, a) { return s + (a.score_percent || 0); }, 0) / done.length);
+};
+
+SS.renderStudents = function(students) {
+    var el = document.getElementById('stuList');
+    if (!el) return;
 
     var h = '';
     if (students.length === 0) {
-        h = '<div style="text-align:center;color:var(--tx3);padding:2rem;font-size:.875rem">No students registered yet.</div>';
+        h = '<div style="text-align:center;color:var(--tx3);padding:2rem;font-size:.875rem">No students found.</div>';
     } else {
-        h += '<div style="font-size:.75rem;color:var(--tx2);margin-bottom:.75rem">' + students.length + ' student' + (students.length > 1 ? 's' : '') + ' registered</div>';
-        h += '<table class="rtbl"><thead><tr><th>Student</th><th>Joined</th><th>Tests Done</th><th>Avg Score</th><th>In Progress</th><th>Actions</th></tr></thead><tbody>';
+        h += '<div style="font-size:.75rem;color:var(--tx2);margin-bottom:.75rem">' + students.length + ' student' + (students.length > 1 ? 's' : '') + ' found</div>';
+        h += '<table class="rtbl"><thead><tr><th>Student</th><th>Status</th><th>Subscription</th><th>Tests</th><th>Avg Score</th><th>Last Active</th><th>Actions</th></tr></thead><tbody>';
+        
         students.forEach(function(stu) {
-            var sa = attempts.filter(function(a) { return a.user_id === stu.id; });
+            var sa = S.allStudentAttempts.filter(function(a) { return a.user_id === stu.id; });
             var done = sa.filter(function(a) { return a.status === 'completed' || a.status === 'timed_out'; });
-            var inProg = sa.filter(function(a) { return a.status === 'in_progress' || a.status === 'paused'; });
-            var avg = done.length > 0 ? Math.round(done.reduce(function(s, a) { return s + (a.score_percent || 0); }, 0) / done.length) : 0;
+            var avg = SS.getStudentAvgScore(stu.id);
             var avgCl = avg >= 80 ? 'pill-h' : avg >= 50 ? 'pill-m' : 'pill-l';
             var joined = stu.created_at ? new Date(stu.created_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+            var lastActive = stu.last_active ? new Date(stu.last_active).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
+            
+            // 계정 상태
+            var isActive = stu.is_active !== false;
+            var statusBadge = isActive ? '<span class="bd bd-d">✅ Active</span>' : '<span class="bd bd-n">🚫 Disabled</span>';
+            
+            // 구독 상태
+            var subStatus = stu.subscription_status || 'none';
+            var subBadge = '';
+            if (subStatus === 'active') subBadge = '<span class="bd bd-d">💳 Active</span>';
+            else if (subStatus === 'cancelled') subBadge = '<span class="bd bd-p">⏳ Cancelled</span>';
+            else if (subStatus === 'past_due') subBadge = '<span class="bd bd-n">⚠️ Past Due</span>';
+            else subBadge = '<span class="bd bd-l">—</span>';
 
-            h += '<tr><td><div style="display:flex;align-items:center;gap:.5rem"><div style="width:28px;height:28px;border-radius:50%;background:var(--blue-p);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700">' + (stu.email || '?').charAt(0).toUpperCase() + '</div><div><div style="font-weight:600;font-size:.8125rem">' + esc(stu.display_name || 'Student') + '</div><div style="font-size:.7rem;color:var(--tx3)">' + esc(stu.email || stu.id.substring(0,8)) + '</div></div></div></td>';
-            h += '<td>' + joined + '</td>';
+            h += '<tr' + (!isActive ? ' style="opacity:.6"' : '') + '>';
+            h += '<td><div style="display:flex;align-items:center;gap:.5rem"><div style="width:28px;height:28px;border-radius:50%;background:var(--blue-p);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700">' + (stu.email || '?').charAt(0).toUpperCase() + '</div><div><div style="font-weight:600;font-size:.8125rem">' + esc(stu.display_name || 'Student') + '</div><div style="font-size:.7rem;color:var(--tx3)">' + esc(stu.email || stu.id.substring(0,8)) + '</div></div></div></td>';
+            h += '<td>' + statusBadge + '</td>';
+            h += '<td>' + subBadge + '</td>';
             h += '<td><b>' + done.length + '</b></td>';
             h += '<td>' + (done.length > 0 ? '<span class="pill ' + avgCl + '">' + avg + '%</span>' : '—') + '</td>';
-            h += '<td>' + (inProg.length > 0 ? '<span class="bd bd-u">' + inProg.length + ' active</span>' : '—') + '</td>';
-            h += '<td><button class="aqb" style="background:var(--blue-p);color:var(--blue)" onclick="SS.stuDetail(\'' + stu.id + '\')">Details</button></td></tr>';
+            h += '<td style="font-size:.75rem">' + lastActive + '</td>';
+            h += '<td style="white-space:nowrap">';
+            h += '<button class="aqb" style="background:var(--blue-p);color:var(--blue)" onclick="SS.stuDetail(\'' + stu.id + '\')">📋</button> ';
+            if (isActive) {
+                h += '<button class="aqb" style="background:var(--red-p);color:var(--red)" onclick="SS.toggleStudent(\'' + stu.id + '\',false)" title="Disable Account">🚫</button> ';
+            } else {
+                h += '<button class="aqb" style="background:var(--green-p);color:var(--green)" onclick="SS.toggleStudent(\'' + stu.id + '\',true)" title="Enable Account">✅</button> ';
+            }
+            h += '<button class="aqb" style="background:var(--gold-p);color:var(--gold)" onclick="SS.forceLogout(\'' + stu.id + '\')" title="Force Logout">🔐</button>';
+            h += '</td></tr>';
         });
         h += '</tbody></table>';
     }
     h += '<div id="stuDetail"></div>';
     el.innerHTML = h;
+};
+
+// 계정 활성화/비활성화
+SS.toggleStudent = function(userId, enable) {
+    var action = enable ? 'enable' : 'disable';
+    var msg = enable ? 'This student will be able to log in again.' : 'This student will not be able to access the platform.';
+    showCf((enable ? 'Enable' : 'Disable') + ' Account?', msg, async function() {
+        var { error } = await SB.from('profiles')
+            .update({ is_active: enable })
+            .eq('id', userId);
+        
+        if (error) {
+            toast('Error: ' + error.message, 'w');
+        } else {
+            toast('Account ' + (enable ? 'enabled' : 'disabled') + '!');
+            // 로컬 캐시 업데이트
+            var stu = S.allStudents.find(function(s) { return s.id === userId; });
+            if (stu) stu.is_active = enable;
+            SS.filterStudents();
+        }
+    });
+};
+
+// 강제 로그아웃
+SS.forceLogout = function(userId) {
+    showCf('Force Logout?', 'This will invalidate the student\'s current session. They will need to log in again.', async function() {
+        var { error } = await SB.from('profiles')
+            .update({ active_session_id: null })
+            .eq('id', userId);
+        
+        if (error) {
+            toast('Error: ' + error.message, 'w');
+        } else {
+            toast('🔐 Session invalidated — student logged out!');
+        }
+    });
 };
 
 SS.stuDetail = async function(userId) {

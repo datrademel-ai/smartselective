@@ -148,6 +148,21 @@ form.addEventListener('submit', async function(e) {
         if (error) throw error;
         
         // ============================================================
+        // 계정 활성화 상태 확인
+        // ============================================================
+        var { data: profile, error: profileError } = await SB.from('profiles')
+            .select('is_active')
+            .eq('id', data.user.id)
+            .single();
+        
+        if (profile && profile.is_active === false) {
+            await SB.auth.signOut();
+            showError('Your account has been disabled. Please contact support.');
+            setLoading(false);
+            return;
+        }
+        
+        // ============================================================
         // 단일 기기 로그인: 세션 ID 생성 및 저장
         // ============================================================
         var sessionId = crypto.randomUUID();
