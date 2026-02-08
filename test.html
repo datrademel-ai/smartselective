@@ -1341,29 +1341,74 @@ function closeSubmitModal() {
 async function submitTest() {
   clearInterval(timerInterval);
 
-  // Calculate time spent
+  // Calculate score
+  let correct = 0;
+  TEST_DATA.questions.forEach((q, i) => {
+    if (answers[i] === q.correctAnswer) correct++;
+  });
+
+  const total = TEST_DATA.questions.length;
   const totalTimeSpent = Math.floor((Date.now() - testStartTime) / 1000);
+  const pct = Math.round((correct / total) * 100);
 
-  // Build results object compatible with results.html
-  const results = {
-    testId: TEST_DATA.testId,
-    testName: TEST_DATA.testName,
-    totalQuestions: TEST_DATA.questions.length,
-    timeLimit: TEST_DATA.timeLimit,
-    timeSpent: totalTimeSpent,
-    subjects: [TEST_DATA.subjectConfig],
-    questions: TEST_DATA.questions.map((q, i) => ({
-      ...q,
-      userAnswer: answers[i],
-      timeSpent: questionTimes[i]
-    }))
-  };
+  // Build answers object for Supabase
+  const answersObj = {};
+  answers.forEach((ans, i) => {
+    if (ans !== null) answersObj[String(i)] = ans;
+  });
 
-  // Save to localStorage for results page
-  localStorage.setItem('smartselective_results', JSON.stringify(results));
-  
-  // Redirect to results
-  window.location.href = 'results.html';
+  // Get user
+  const { data: { session } } = await SB.auth.getSession();
+  if (!session) {
+    alert('Session expired. Please login again.');
+    window.location.href = 'login.html';
+    return;
+  }
+
+  // Check if attempt exists, if not create one
+  let attemptId = null;
+  const { data: existingAttempt } = await SB
+    .from('test_attempts')
+    .select('id')
+    .eq('user_id', session.user.id)
+    .eq('test_id', TEST_DATA.testId)
+    .single();
+
+  if (existingAttempt) {
+    attemptId = existingAttempt.id;
+    // Update existing attempt
+    await SB.from('test_attempts').update({
+      status: 'completed',
+      score: correct,
+      total_questions: total,
+      score_percent: pct,
+      time_used_seconds: totalTimeSpent,
+      answers: answersObj,
+      completed_at: new Date().toISOString()
+    }).eq('id', attemptId);
+  } else {
+    // Create new attempt
+    const { data: newAttempt } = await SB.from('test_attempts').insert({
+      user_id: session.user.id,
+      test_id: TEST_DATA.testId,
+      status: 'completed',
+      score: correct,
+      total_questions: total,
+      score_percent: pct,
+      time_used_seconds: totalTimeSpent,
+      answers: answersObj,
+      completed_at: new Date().toISOString()
+    }).select().single();
+    attemptId = newAttempt?.id;
+  }
+
+  // Redirect to results with attempt_id
+  if (attemptId) {
+    window.location.href = `results.html?attempt_id=${attemptId}`;
+  } else {
+    alert('Error saving results. Please try again.');
+    window.location.href = 'dashboard.html';
+  }
 }
 
 function autoSubmit() {
