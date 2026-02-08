@@ -1308,7 +1308,6 @@ function updateProgress() {
   const answered = answers.filter(a => a !== null).length;
   const total = TEST_DATA.questions.length;
   document.getElementById('answeredCount').innerHTML = `<strong>${answered}</strong>`;
-  document.getElementById('progressBar').style.width = `${(answered/total)*100}%`;
   // 하단 네비게이션 업데이트
   document.getElementById('currentQNum').textContent = currentQ + 1;
   document.getElementById('totalQNum').textContent = total;
