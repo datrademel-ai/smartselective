@@ -227,7 +227,7 @@ html, body {
 }
 
 /* ============================================================
-   MAIN LAYOUT — left panel (passage) + right panel (questions)
+   MAIN LAYOUT — left panel (questions) + right panel (passage)
    ============================================================ */
 .exam-layout {
   display: flex;
@@ -235,31 +235,31 @@ html, body {
   overflow: hidden;
 }
 
-/* LEFT PANEL — Passage / Reading Material */
+/* LEFT PANEL — Question + Options */
 .left-panel {
-  width: 45%;
-  min-width: 320px;
-  max-width: 600px;
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
   border-right: 1px solid var(--border);
 }
 
-.left-panel.collapsed {
+/* RIGHT PANEL — Passage / Reading Material */
+.right-panel {
+  width: 48%;
+  min-width: 380px;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+}
+
+.right-panel.collapsed {
   width: 0;
   min-width: 0;
   max-width: 0;
   overflow: hidden;
   border: none;
-}
-
-/* RIGHT PANEL — Question + Options */
-.right-panel {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
 }
 
 /* Resize handle */
@@ -523,15 +523,40 @@ html, body {
   box-shadow: 0 0 20px var(--accent-glow);
 }
 
-/* Nav progress info (replaces question map) */
-.nav-progress-info {
-  font-size: 14px;
-  color: var(--text-secondary);
+/* Question map (mini) */
+.q-map-strip {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  max-width: 500px;
+  justify-content: center;
 }
 
-.nav-progress-info strong {
-  color: var(--text-primary);
+.q-dot {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
   font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  position: relative;
+}
+
+.q-dot:hover { background: var(--bg-hover); color: var(--text-primary); }
+.q-dot.current { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+.q-dot.answered { background: var(--green-bg); color: var(--green); border-color: rgba(16,185,129,0.3); }
+.q-dot.flagged-dot::after {
+  content: '';
+  position: absolute;
+  top: -2px; right: -2px;
+  width: 8px; height: 8px;
+  background: var(--orange);
+  border-radius: 50%;
+  border: 2px solid var(--bg-primary);
 }
 
 /* ============================================================
@@ -683,6 +708,53 @@ html, body {
   margin-bottom: 24px;
 }
 
+/* Navigator grid */
+.nav-legend {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.nav-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.legend-swatch {
+  width: 16px; height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.nav-cell {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-cell:hover { background: var(--bg-hover); }
+.nav-cell.current { background: var(--accent); color: #fff; border-color: var(--accent); }
+.nav-cell.answered { background: var(--green-bg); color: var(--green); border-color: rgba(16,185,129,0.3); }
+.nav-cell.flagged-cell { border-color: var(--orange); }
+
 /* Submit stats */
 .submit-stats {
   display: flex;
@@ -766,81 +838,56 @@ html, body {
    RESPONSIVE
    ============================================================ */
 @media (max-width: 900px) {
-  .left-panel {
+  .right-panel {
     display: none;
   }
   .resize-handle { display: none; }
   .question-section { padding: 24px; }
   .topbar-center { display: none; }
+  .q-map-strip { display: none; }
+  
+  /* Mobile footer fix */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 16px;
+    z-index: 100;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  }
+  
+  .nav-btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  
+  .progress-bar-wrap {
+    display: none;
+  }
+  
+  .left-panel {
+    padding-bottom: 80px; /* Space for fixed footer */
+  }
 }
 
-/* ============================================================
-   PAUSE OVERLAY
-   ============================================================ */
-.pause-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(11, 15, 26, 0.95);
-  backdrop-filter: blur(8px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 500;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.pause-overlay.show {
-  display: flex;
-}
-
-.pause-icon {
-  font-size: 64px;
-}
-
-.pause-content {
-  text-align: center;
-}
-
-.pause-content h2 {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.pause-content p {
-  color: var(--text-secondary);
-  font-size: 15px;
-  margin-bottom: 24px;
-}
-
-.pause-timer {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 48px;
-  font-weight: 700;
-  color: var(--accent);
-  margin-bottom: 32px;
-}
-
-.pause-resume-btn {
-  padding: 16px 48px;
-  border-radius: var(--radius-md);
-  background: var(--accent);
-  color: #fff;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.pause-resume-btn:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 0 24px var(--accent-glow);
+@media (max-width: 480px) {
+  .bottom-nav {
+    padding: 10px 12px;
+  }
+  
+  .nav-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+    gap: 4px;
+  }
+  
+  .nav-btn svg {
+    width: 14px;
+    height: 14px;
+  }
 }
 </style>
 </head>
@@ -869,9 +916,9 @@ html, body {
     </div>
   </div>
   <div class="topbar-right">
-    <button class="topbar-btn" id="pauseBtn" onclick="togglePause()">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-      Pause
+    <button class="topbar-btn" onclick="openNavigator()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Navigator
     </button>
     <button class="topbar-btn btn-submit" onclick="openSubmitModal()">Submit Test</button>
   </div>
@@ -879,36 +926,8 @@ html, body {
 
 <!-- MAIN EXAM LAYOUT -->
 <div class="exam-layout">
-  <!-- LEFT PANEL: Passage -->
-  <div class="left-panel" id="leftPanel">
-    <div class="passage-header">
-      <div class="passage-title">
-        <div class="passage-title-icon">
-          <svg width="16" height="16" fill="none" stroke="var(--cyan)" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-        </div>
-        <span id="passageLabel">Reading Passage</span>
-      </div>
-      <div class="passage-controls">
-        <button class="passage-ctrl-btn" onclick="changePassageFontSize(-1)" title="Decrease font">A−</button>
-        <button class="passage-ctrl-btn" onclick="changePassageFontSize(1)" title="Increase font">A+</button>
-      </div>
-    </div>
-    <div class="passage-body">
-      <div class="passage-content" id="passageContent">
-        <div class="no-passage" id="noPassage">
-          <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-          <p>No passage for this question</p>
-          <p style="font-size:12px">Passage will appear here when relevant</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- RESIZE HANDLE -->
-  <div class="resize-handle" id="resizeHandle"></div>
-
-  <!-- RIGHT PANEL: Question -->
-  <div class="right-panel" id="rightPanel">
+  <!-- LEFT: Question -->
+  <div class="left-panel">
     <div class="question-section" id="questionSection">
       <div class="q-top-bar">
         <div class="q-number-badge">
@@ -940,8 +959,11 @@ html, body {
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         Previous
       </button>
-      <div class="nav-progress-info">
-        Question <strong id="currentQNum">1</strong> of <strong id="totalQNum">1</strong>
+      <div class="q-map-strip" id="qMapStrip">
+        <!-- Dots rendered by JS -->
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progressBar"></div>
       </div>
       <button class="nav-btn nav-btn-next" id="nextBtn" onclick="nextQuestion()">
         Next
@@ -950,22 +972,57 @@ html, body {
     </div>
   </div>
 
+  <!-- RESIZE HANDLE -->
+  <div class="resize-handle" id="resizeHandle"></div>
+
+  <!-- RIGHT PANEL: Passage -->
+  <div class="right-panel" id="rightPanel">
+    <div class="passage-header">
+      <div class="passage-title">
+        <div class="passage-title-icon">
+          <svg width="16" height="16" fill="none" stroke="var(--cyan)" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        </div>
+        <span id="passageLabel">Reading Passage</span>
+      </div>
+      <div class="passage-controls">
+        <button class="passage-ctrl-btn" onclick="changePassageFontSize(-1)" title="Decrease font">A−</button>
+        <button class="passage-ctrl-btn" onclick="changePassageFontSize(1)" title="Increase font">A+</button>
+        <button class="passage-ctrl-btn" onclick="collapseRightPanel()" title="Collapse panel">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="passage-body">
+      <div class="passage-content" id="passageContent">
+        <div class="no-passage" id="noPassage">
+          <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          <p>No passage for this question</p>
+          <p style="font-size:12px">Passage will appear here when relevant</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ============================================================
-     PAUSE OVERLAY
+     NAVIGATOR MODAL
      ============================================================ -->
-<div class="pause-overlay" id="pauseOverlay">
-  <div class="pause-icon">⏸️</div>
-  <div class="pause-content">
-    <h2>Test Paused</h2>
-    <p>Your progress has been saved. Resume when you're ready.</p>
+<div class="modal-overlay" id="navModal">
+  <div class="modal-box">
+    <div class="modal-title">Question Navigator</div>
+    <div class="modal-sub">Click any question to jump to it</div>
+    <div class="nav-legend">
+      <div class="nav-legend-item"><div class="legend-swatch" style="background:var(--accent)"></div> Current</div>
+      <div class="nav-legend-item"><div class="legend-swatch" style="background:var(--green-bg);border-color:rgba(16,185,129,0.3)"></div> Answered</div>
+      <div class="nav-legend-item"><div class="legend-swatch" style="border-color:var(--orange)"></div> Flagged</div>
+      <div class="nav-legend-item"><div class="legend-swatch"></div> Unanswered</div>
+    </div>
+    <div class="nav-grid" id="navGrid"></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeNavigator()">Close</button>
+    </div>
   </div>
-  <div class="pause-timer" id="pauseTimerDisplay">--:--</div>
-  <button class="pause-resume-btn" onclick="togglePause()">
-    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-    Resume Test
-  </button>
 </div>
 
 <!-- ============================================================
@@ -1133,6 +1190,7 @@ function initTest() {
   document.getElementById('testTitleDisplay').innerHTML = 
     `<strong>${TEST_DATA.testName}</strong>`;
   
+  buildQuestionMap();
   startTimer();
   setupKeyboard();
   setupResize();
@@ -1145,15 +1203,9 @@ function initTest() {
 function startTimer() {
   updateTimerDisplay();
   timerInterval = setInterval(() => {
-    if (isPaused) return; // Pause 상태면 타이머 정지
-    
     timeRemaining--;
     questionTimes[currentQ]++;
     updateTimerDisplay();
-    
-    // Pause 타이머 디스플레이도 업데이트
-    document.getElementById('pauseTimerDisplay').textContent = 
-      document.getElementById('timerText').textContent;
 
     if (timeRemaining <= 0) {
       clearInterval(timerInterval);
@@ -1207,11 +1259,12 @@ function renderQuestion() {
     optList.appendChild(item);
   });
 
-  // Passage (left panel)
+  // Passage (right panel)
   renderPassage(q);
 
   // Update nav
   updateProgress();
+  updateQuestionMap();
 
   // Prev/Next button states
   document.getElementById('prevBtn').style.opacity = currentQ === 0 ? '0.4' : '1';
@@ -1221,13 +1274,12 @@ function renderQuestion() {
 function renderPassage(q) {
   const content = document.getElementById('passageContent');
   const label = document.getElementById('passageLabel');
-  const leftPanel = document.getElementById('leftPanel');
 
   if (q.passage) {
     content.innerHTML = `<div class="passage-label">${q.subject}</div>${q.passage}`;
     content.style.fontSize = passageFontSize + 'px';
     label.textContent = 'Reading Passage';
-    leftPanel.classList.remove('collapsed');
+    document.getElementById('rightPanel').classList.remove('collapsed');
   } else {
     content.innerHTML = `<div class="no-passage">
       <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
@@ -1235,8 +1287,6 @@ function renderPassage(q) {
       <p style="font-size:12px;margin-top:4px">This is a standalone ${q.subject} question</p>
     </div>`;
     label.textContent = q.subject;
-    // 지문 없는 문제는 왼쪽 패널 숨김
-    leftPanel.classList.add('collapsed');
   }
 }
 
@@ -1286,31 +1336,58 @@ function scrollToTop() {
 }
 
 // ============================================================
-//  PAUSE FUNCTIONALITY
+//  PROGRESS & QUESTION MAP
 // ============================================================
-let isPaused = false;
-
-function togglePause() {
-  isPaused = !isPaused;
-  const overlay = document.getElementById('pauseOverlay');
-  const btn = document.getElementById('pauseBtn');
-  
-  if (isPaused) {
-    overlay.classList.add('show');
-    document.getElementById('pauseTimerDisplay').textContent = document.getElementById('timerText').textContent;
-    btn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Resume`;
-  } else {
-    overlay.classList.remove('show');
-    btn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg> Pause`;
-  }
-}
 function updateProgress() {
   const answered = answers.filter(a => a !== null).length;
   const total = TEST_DATA.questions.length;
   document.getElementById('answeredCount').innerHTML = `<strong>${answered}</strong>`;
-  // 하단 네비게이션 업데이트
-  document.getElementById('currentQNum').textContent = currentQ + 1;
-  document.getElementById('totalQNum').textContent = total;
+  document.getElementById('progressBar').style.width = `${(answered/total)*100}%`;
+}
+
+function buildQuestionMap() {
+  const strip = document.getElementById('qMapStrip');
+  strip.innerHTML = '';
+  TEST_DATA.questions.forEach((q, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'q-dot';
+    dot.textContent = q.id;
+    dot.onclick = () => goToQuestion(i);
+    strip.appendChild(dot);
+  });
+}
+
+function updateQuestionMap() {
+  const dots = document.querySelectorAll('.q-dot');
+  dots.forEach((dot, i) => {
+    dot.className = 'q-dot';
+    if (i === currentQ) dot.classList.add('current');
+    else if (answers[i] !== null) dot.classList.add('answered');
+    if (flags[i]) dot.classList.add('flagged-dot');
+  });
+}
+
+// ============================================================
+//  NAVIGATOR MODAL
+// ============================================================
+function openNavigator() {
+  const grid = document.getElementById('navGrid');
+  grid.innerHTML = '';
+  TEST_DATA.questions.forEach((q, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'nav-cell';
+    if (i === currentQ) cell.classList.add('current');
+    else if (answers[i] !== null) cell.classList.add('answered');
+    if (flags[i]) cell.classList.add('flagged-cell');
+    cell.textContent = q.id;
+    cell.onclick = () => goToQuestion(i);
+    grid.appendChild(cell);
+  });
+  document.getElementById('navModal').classList.add('show');
+}
+
+function closeNavigator() {
+  document.getElementById('navModal').classList.remove('show');
 }
 
 // ============================================================
@@ -1341,74 +1418,29 @@ function closeSubmitModal() {
 async function submitTest() {
   clearInterval(timerInterval);
 
-  // Calculate score
-  let correct = 0;
-  TEST_DATA.questions.forEach((q, i) => {
-    if (answers[i] === q.correctAnswer) correct++;
-  });
-
-  const total = TEST_DATA.questions.length;
+  // Calculate time spent
   const totalTimeSpent = Math.floor((Date.now() - testStartTime) / 1000);
-  const pct = Math.round((correct / total) * 100);
 
-  // Build answers object for Supabase
-  const answersObj = {};
-  answers.forEach((ans, i) => {
-    if (ans !== null) answersObj[String(i)] = ans;
-  });
+  // Build results object compatible with results.html
+  const results = {
+    testId: TEST_DATA.testId,
+    testName: TEST_DATA.testName,
+    totalQuestions: TEST_DATA.questions.length,
+    timeLimit: TEST_DATA.timeLimit,
+    timeSpent: totalTimeSpent,
+    subjects: [TEST_DATA.subjectConfig],
+    questions: TEST_DATA.questions.map((q, i) => ({
+      ...q,
+      userAnswer: answers[i],
+      timeSpent: questionTimes[i]
+    }))
+  };
 
-  // Get user
-  const { data: { session } } = await SB.auth.getSession();
-  if (!session) {
-    alert('Session expired. Please login again.');
-    window.location.href = 'login.html';
-    return;
-  }
-
-  // Check if attempt exists, if not create one
-  let attemptId = null;
-  const { data: existingAttempt } = await SB
-    .from('test_attempts')
-    .select('id')
-    .eq('user_id', session.user.id)
-    .eq('test_id', TEST_DATA.testId)
-    .single();
-
-  if (existingAttempt) {
-    attemptId = existingAttempt.id;
-    // Update existing attempt
-    await SB.from('test_attempts').update({
-      status: 'completed',
-      score: correct,
-      total_questions: total,
-      score_percent: pct,
-      time_used_seconds: totalTimeSpent,
-      answers: answersObj,
-      completed_at: new Date().toISOString()
-    }).eq('id', attemptId);
-  } else {
-    // Create new attempt
-    const { data: newAttempt } = await SB.from('test_attempts').insert({
-      user_id: session.user.id,
-      test_id: TEST_DATA.testId,
-      status: 'completed',
-      score: correct,
-      total_questions: total,
-      score_percent: pct,
-      time_used_seconds: totalTimeSpent,
-      answers: answersObj,
-      completed_at: new Date().toISOString()
-    }).select().single();
-    attemptId = newAttempt?.id;
-  }
-
-  // Redirect to results with attempt_id
-  if (attemptId) {
-    window.location.href = `results.html?attempt_id=${attemptId}`;
-  } else {
-    alert('Error saving results. Please try again.');
-    window.location.href = 'dashboard.html';
-  }
+  // Save to localStorage for results page
+  localStorage.setItem('smartselective_results', JSON.stringify(results));
+  
+  // Redirect to results
+  window.location.href = 'results.html';
 }
 
 function autoSubmit() {
@@ -1431,8 +1463,7 @@ function setupKeyboard() {
     else if (key === 'arrowright' || key === 'n') nextQuestion();
     else if (key === 'arrowleft' || key === 'p') prevQuestion();
     else if (key === 'f') toggleFlag();
-    else if (key === ' ') { e.preventDefault(); togglePause(); }
-    else if (key === 'escape') { closeSubmitModal(); }
+    else if (key === 'escape') { closeNavigator(); closeSubmitModal(); }
   });
 }
 
@@ -1444,9 +1475,13 @@ function changePassageFontSize(delta) {
   document.getElementById('passageContent').style.fontSize = passageFontSize + 'px';
 }
 
+function collapseRightPanel() {
+  document.getElementById('rightPanel').classList.toggle('collapsed');
+}
+
 function setupResize() {
   const handle = document.getElementById('resizeHandle');
-  const leftPanel = document.getElementById('leftPanel');
+  const rightPanel = document.getElementById('rightPanel');
   let isResizing = false;
 
   handle.addEventListener('mousedown', (e) => {
@@ -1459,11 +1494,12 @@ function setupResize() {
 
   document.addEventListener('mousemove', (e) => {
     if (!isResizing) return;
-    const newWidth = e.clientX;
-    const clamped = Math.max(280, Math.min(window.innerWidth * 0.55, newWidth));
-    leftPanel.style.width = clamped + 'px';
-    leftPanel.style.maxWidth = clamped + 'px';
-    leftPanel.style.minWidth = clamped + 'px';
+    const containerWidth = document.querySelector('.exam-layout').offsetWidth;
+    const newWidth = containerWidth - e.clientX;
+    const clamped = Math.max(300, Math.min(containerWidth * 0.6, newWidth));
+    rightPanel.style.width = clamped + 'px';
+    rightPanel.style.maxWidth = clamped + 'px';
+    rightPanel.style.minWidth = clamped + 'px';
   });
 
   document.addEventListener('mouseup', () => {
@@ -1477,12 +1513,11 @@ function setupResize() {
 }
 
 // Close modals on overlay click
+document.getElementById('navModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('navModal')) closeNavigator();
+});
 document.getElementById('submitModal').addEventListener('click', (e) => {
   if (e.target === document.getElementById('submitModal')) closeSubmitModal();
-});
-
-document.getElementById('pauseOverlay').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('pauseOverlay')) togglePause();
 });
 
 // ============================================================
