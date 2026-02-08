@@ -496,13 +496,69 @@ body {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="shared.js"></script>
 <script>
 (function() {
 'use strict';
 
-var SS = window.SS_Shared;
+// ============================================================
+// SUPABASE CLIENT & UTILITIES (inline - no shared.js dependency)
+// ============================================================
+var SB = window.supabase.createClient(
+  'https://qeowtqkfotypsrkfaniw.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlb3d0cWtmb3R5cHNya2Zhbml3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxNDUwNjYsImV4cCI6MjA4NTcyMTA2Nn0.Og5eSoXdP-5hSEC1CnH1jYZ8BiscaL9Ah5KhQhaO0eA'
+);
 
+var SUBJ = [
+  { id: 'reading', title: 'Reading Comprehension', icon: '📖' },
+  { id: 'math', title: 'Mathematics', icon: '🔢' },
+  { id: 'verbal', title: 'Verbal Reasoning', icon: '💬' },
+  { id: 'numerical', title: 'Numerical Reasoning', icon: '🧮' }
+];
+
+function getUrlParam(name) {
+  var params = new URLSearchParams(window.location.search);
+  return params.get(name);
+}
+
+function fmt(s) {
+  var m = Math.floor(s / 60), sc = s % 60;
+  return (m < 10 ? '0' : '') + m + ':' + (sc < 10 ? '0' : '') + sc;
+}
+
+function esc(s) {
+  if (!s) return '';
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+async function requireAuth() {
+  var { data: { session } } = await SB.auth.getSession();
+  if (!session) {
+    window.location.href = '/login.html';
+    return null;
+  }
+  return session.user;
+}
+
+async function dbLoadAttempt(attemptId) {
+  var { data } = await SB.from('test_attempts').select('*').eq('id', attemptId).single();
+  return data;
+}
+
+async function dbLoadTestById(testId) {
+  var { data } = await SB.from('weekly_tests').select('*').eq('id', testId).single();
+  return data;
+}
+
+async function dbLoadQuestions(testId) {
+  var { data } = await SB.from('questions').select('*').eq('test_id', testId).order('question_order');
+  return data || [];
+}
+
+// ============================================================
+// MAIN APP
+// ============================================================
 var state = {
   attempt: null,
   test: null,
@@ -511,7 +567,7 @@ var state = {
 };
 
 async function init() {
-  var attemptId = SS.getUrlParam('attempt_id');
+  var attemptId = getUrlParam('attempt_id');
   if (!attemptId) {
     alert('No result specified.');
     window.location.href = '/dashboard.html';
@@ -519,11 +575,11 @@ async function init() {
   }
 
   // Check auth
-  var user = await SS.requireAuth('/login.html');
+  var user = await requireAuth();
   if (!user) return;
 
   // Load attempt
-  state.attempt = await SS.dbLoadAttempt(attemptId);
+  state.attempt = await dbLoadAttempt(attemptId);
   if (!state.attempt || state.attempt.user_id !== user.id) {
     alert('Result not found.');
     window.location.href = '/dashboard.html';
@@ -531,10 +587,10 @@ async function init() {
   }
 
   // Load test
-  state.test = await SS.dbLoadTestById(state.attempt.test_id);
+  state.test = await dbLoadTestById(state.attempt.test_id);
 
   // Load questions
-  var rawQuestions = await SS.dbLoadQuestions(state.attempt.test_id);
+  var rawQuestions = await dbLoadQuestions(state.attempt.test_id);
   state.questions = rawQuestions.map(function(q) {
     return {
       id: q.id,
@@ -584,7 +640,7 @@ function renderResults() {
   document.getElementById('scorePercent').textContent = pct + '%';
 
   // Test title
-  var subj = SS.SUBJ.find(function(s) { return s.id === state.test.subject; });
+  var subj = SUBJ.find(function(s) { return s.id === state.test.subject; });
   document.getElementById('testTitle').textContent = (subj ? subj.icon + ' ' : '') + (subj ? subj.title : state.test.title);
 
   // Meta
@@ -612,7 +668,7 @@ function renderResults() {
   document.getElementById('statCorrect').textContent = correct;
   document.getElementById('statWrong').textContent = wrong;
   document.getElementById('statSkipped').textContent = skipped;
-  document.getElementById('statTime').textContent = SS.fmt(a.time_used_seconds || 0);
+  document.getElementById('statTime').textContent = fmt(a.time_used_seconds || 0);
 
   // Questions list
   renderQuestions();
@@ -648,7 +704,7 @@ function renderQuestions() {
     html += '<div class="question-header" onclick="toggleQuestion(' + i + ')">';
     html += '<div class="question-info">';
     html += '<div class="q-num ' + status + '">' + (i + 1) + '</div>';
-    html += '<div class="q-preview">' + SS.esc(q.question).substring(0, 80) + (q.question.length > 80 ? '...' : '') + '</div>';
+    html += '<div class="q-preview">' + esc(q.question).substring(0, 80) + (q.question.length > 80 ? '...' : '') + '</div>';
     html += '</div>';
     html += '<div class="q-status ' + status + '">' + statusText + '</div>';
     html += '</div>';
@@ -656,10 +712,10 @@ function renderQuestions() {
     html += '<div class="question-body">';
     
     if (q.passage) {
-      html += '<div class="q-passage">' + SS.esc(q.passage) + '</div>';
+      html += '<div class="q-passage">' + esc(q.passage) + '</div>';
     }
 
-    html += '<div class="q-text">' + SS.esc(q.question) + '</div>';
+    html += '<div class="q-text">' + esc(q.question) + '</div>';
 
     html += '<div class="q-options">';
     q.options.forEach(function(opt, j) {
@@ -673,7 +729,7 @@ function renderQuestions() {
 
       html += '<div class="' + classes + '">';
       html += '<div class="q-option-letter">' + letters[j] + '</div>';
-      html += '<div>' + SS.esc(opt) + marker + '</div>';
+      html += '<div>' + esc(opt) + marker + '</div>';
       html += '</div>';
     });
     html += '</div>';
@@ -681,7 +737,7 @@ function renderQuestions() {
     if (q.explanation) {
       html += '<div class="q-explanation">';
       html += '<div class="q-explanation-title">💡 Explanation</div>';
-      html += '<p>' + SS.esc(q.explanation) + '</p>';
+      html += '<p>' + esc(q.explanation) + '</p>';
       html += '</div>';
     }
 
