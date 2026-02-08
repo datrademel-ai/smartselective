@@ -3,1695 +3,707 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SmartSelective - Test Results & Analysis</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
+<title>Results — SmartSelective</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,600;6..72,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg-primary: #0a0e1a;
-  --bg-secondary: #111827;
-  --bg-card: #1a2035;
-  --bg-card-hover: #1e2642;
-  --accent-blue: #3b82f6;
-  --accent-green: #10b981;
-  --accent-red: #ef4444;
-  --accent-orange: #f59e0b;
-  --accent-purple: #8b5cf6;
-  --accent-cyan: #06b6d4;
+  --bg-deep: #0f172a;
+  --bg-primary: #1e293b;
+  --bg-panel: #334155;
+  --bg-hover: #475569;
+  --accent: #6366f1;
+  --green: #10b981;
+  --green-bg: rgba(16,185,129,0.12);
+  --red: #ef4444;
+  --red-bg: rgba(239,68,68,0.1);
+  --orange: #f59e0b;
+  --orange-bg: rgba(245,158,11,0.12);
   --text-primary: #f1f5f9;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
-  --border-color: #1e293b;
-  --border-subtle: rgba(255,255,255,0.06);
-  --correct-bg: rgba(16,185,129,0.08);
-  --correct-border: rgba(16,185,129,0.25);
-  --wrong-bg: rgba(239,68,68,0.08);
-  --wrong-border: rgba(239,68,68,0.25);
-  --skipped-bg: rgba(245,158,11,0.08);
-  --skipped-border: rgba(245,158,11,0.25);
-  --glow-blue: 0 0 30px rgba(59,130,246,0.15);
-  --glow-green: 0 0 20px rgba(16,185,129,0.1);
-  --glow-red: 0 0 20px rgba(239,68,68,0.1);
+  --border: rgba(255,255,255,0.08);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --radius-xl: 20px;
 }
 
-* { margin:0; padding:0; box-sizing:border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg-primary);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg-deep);
   color: var(--text-primary);
   min-height: 100vh;
-  overflow-x: hidden;
 }
 
-/* Background atmosphere */
-body::before {
-  content: '';
+.loading-screen {
   position: fixed;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(ellipse at 20% 20%, rgba(59,130,246,0.04) 0%, transparent 50%),
-              radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.03) 0%, transparent 50%),
-              radial-gradient(ellipse at 50% 50%, rgba(6,182,212,0.02) 0%, transparent 60%);
-  z-index: -1;
-  animation: bgShift 20s ease-in-out infinite alternate;
-}
-
-@keyframes bgShift {
-  0% { transform: translate(0,0) rotate(0deg); }
-  100% { transform: translate(-2%,-2%) rotate(1deg); }
-}
-
-/* ========== TOP HEADER ========== */
-.top-header {
-  background: linear-gradient(180deg, rgba(17,24,39,0.95) 0%, rgba(10,14,26,0.9) 100%);
-  border-bottom: 1px solid var(--border-subtle);
-  backdrop-filter: blur(20px);
-  padding: 16px 32px;
+  inset: 0;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.logo-area {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-mark {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-  border-radius: 10px;
-  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: 'Fraunces', serif;
-  font-weight: 800;
-  font-size: 18px;
-  color: #fff;
+  background: var(--bg-deep);
+  z-index: 1000;
 }
 
-.logo-text {
-  font-family: 'Fraunces', serif;
+.loading-screen.hidden { display: none; }
+
+.loading-logo {
+  font-family: 'Newsreader', serif;
+  font-size: 1.5rem;
   font-weight: 700;
-  font-size: 20px;
-  color: var(--text-primary);
+  margin-bottom: 1rem;
 }
 
-.logo-text span { color: var(--accent-blue); }
+.loading-logo em { font-style: normal; color: var(--accent); }
 
-.header-actions {
+.spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Header */
+.header {
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
   display: flex;
-  gap: 12px;
+  justify-content: space-between;
   align-items: center;
 }
 
-.btn {
+.logo {
+  font-family: 'Newsreader', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.logo em { font-style: normal; color: var(--accent); }
+
+.header-btn {
   padding: 10px 20px;
   border-radius: var(--radius-sm);
-  font-family: 'DM Sans', sans-serif;
+  background: var(--accent);
+  color: #fff;
+  font-family: inherit;
   font-weight: 600;
   font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.header-btn:hover { background: #4f46e5; }
+
+/* Main Container */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+/* Score Card */
+.score-card {
+  background: linear-gradient(135deg, var(--bg-primary), var(--bg-panel));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.score-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.score-badge.excellent { background: var(--green-bg); color: var(--green); }
+.score-badge.good { background: var(--orange-bg); color: var(--orange); }
+.score-badge.needs-work { background: var(--red-bg); color: var(--red); }
+
+.score-ring {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 20px;
+  position: relative;
+}
+
+.score-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.score-ring-bg {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 10;
+}
+
+.score-ring-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease;
+}
+
+.score-ring-fill.excellent { stroke: var(--green); }
+.score-ring-fill.good { stroke: var(--orange); }
+.score-ring-fill.needs-work { stroke: var(--red); }
+
+.score-value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-percent {
+  font-family: 'Newsreader', serif;
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.score-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.test-title {
+  font-family: 'Newsreader', serif;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.test-meta {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  text-align: center;
+}
+
+.stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Questions Review */
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.btn-ghost {
-  background: transparent;
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.tab {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
   color: var(--text-secondary);
-  border: 1px solid var(--border-color);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.btn-ghost:hover {
-  background: var(--bg-card);
-  color: var(--text-primary);
-}
+.tab:hover { background: var(--bg-panel); color: var(--text-primary); }
+.tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-.btn-primary {
-  background: var(--accent-blue);
-  color: #fff;
-}
-
-.btn-primary:hover {
-  background: #2563eb;
-  box-shadow: var(--glow-blue);
-}
-
-.btn-success {
-  background: var(--accent-green);
-  color: #fff;
-}
-
-.btn-success:hover {
-  background: #059669;
-  box-shadow: var(--glow-green);
-}
-
-/* ========== MAIN LAYOUT ========== */
-.main-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 32px;
-}
-
-/* ========== SCORE HERO SECTION ========== */
-.score-hero {
-  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(59,130,246,0.05) 100%);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xl);
-  padding: 48px;
-  margin-bottom: 32px;
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 48px;
-  align-items: center;
-  position: relative;
+.question-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
   overflow: hidden;
 }
 
-.score-hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.score-circle-wrapper {
+.question-header {
+  padding: 16px 20px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-.score-circle {
-  width: 220px;
-  height: 220px;
-  position: relative;
-}
+.question-header:hover { background: var(--bg-panel); }
 
-.score-circle svg {
-  transform: rotate(-90deg);
-  width: 220px;
-  height: 220px;
-}
-
-.score-circle .bg-ring {
-  fill: none;
-  stroke: rgba(255,255,255,0.05);
-  stroke-width: 12;
-}
-
-.score-circle .score-ring {
-  fill: none;
-  stroke-width: 12;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.score-circle .score-inner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-
-.score-number {
-  font-family: 'Fraunces', serif;
-  font-size: 56px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.score-total {
-  font-size: 16px;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-.score-grade {
-  display: inline-flex;
-  padding: 6px 20px;
-  border-radius: 24px;
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 0.5px;
-}
-
-.grade-excellent { background: rgba(16,185,129,0.15); color: var(--accent-green); }
-.grade-good { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
-.grade-average { background: rgba(245,158,11,0.15); color: var(--accent-orange); }
-.grade-poor { background: rgba(239,68,68,0.15); color: var(--accent-red); }
-
-.score-details {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.detail-card {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 24px;
-  transition: all 0.3s ease;
-}
-
-.detail-card:hover {
-  background: rgba(255,255,255,0.04);
-  border-color: rgba(255,255,255,0.1);
-}
-
-.detail-label {
-  font-size: 13px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-}
-
-.detail-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 28px;
-  font-weight: 600;
-}
-
-.detail-sub {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-/* ========== SUBJECT BREAKDOWN ========== */
-.section-title {
-  font-family: 'Fraunces', serif;
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 20px;
+.question-info {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.section-title .icon {
+.q-num {
   width: 32px;
   height: 32px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-}
-
-.subjects-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 40px;
-}
-
-.subject-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-.subject-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255,255,255,0.12);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-}
-
-.subject-card.active {
-  border-color: var(--accent-blue);
-  box-shadow: var(--glow-blue);
-}
-
-.subject-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-}
-
-.subject-name {
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.subject-score-badge {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 6px;
-}
-
-.subject-bar-wrap {
-  height: 6px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 3px;
-  margin-bottom: 12px;
-  overflow: hidden;
-}
-
-.subject-bar {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.subject-stats {
-  display: flex;
-  justify-content: space-between;
   font-size: 13px;
-  color: var(--text-muted);
+  font-weight: 700;
 }
 
-.subject-stat-value { font-family: 'JetBrains Mono', monospace; }
+.q-num.correct { background: var(--green-bg); color: var(--green); }
+.q-num.wrong { background: var(--red-bg); color: var(--red); }
+.q-num.skipped { background: var(--orange-bg); color: var(--orange); }
 
-/* ========== TIME ANALYSIS ========== */
-.time-section {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 32px;
-  margin-bottom: 32px;
-}
-
-.time-bars {
-  display: flex;
-  gap: 3px;
-  align-items: flex-end;
-  height: 120px;
-  padding: 0 8px;
-  margin-top: 16px;
-}
-
-.time-bar-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  height: 100%;
-  justify-content: flex-end;
-}
-
-.time-bar {
-  width: 100%;
-  min-height: 4px;
-  border-radius: 3px 3px 0 0;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  position: relative;
-}
-
-.time-bar:hover {
-  opacity: 0.8;
-  transform: scaleY(1.05);
-  transform-origin: bottom;
-}
-
-.time-bar-label {
-  font-size: 10px;
-  color: var(--text-muted);
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.time-legend {
-  display: flex;
-  gap: 24px;
-  margin-top: 16px;
-  justify-content: center;
-}
-
-.time-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.time-legend-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 3px;
-}
-
-/* ========== TAB NAVIGATION ========== */
-.tabs-nav {
-  display: flex;
-  gap: 4px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-md);
-  padding: 4px;
-  margin-bottom: 24px;
-  border: 1px solid var(--border-subtle);
-}
-
-.tab-btn {
-  flex: 1;
-  padding: 12px 20px;
-  border-radius: var(--radius-sm);
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 600;
+.q-preview {
   font-size: 14px;
-  color: var(--text-muted);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.tab-btn:hover { color: var(--text-secondary); }
-
-.tab-btn.active {
-  background: var(--bg-card);
-  color: var(--text-primary);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-.tab-btn .count {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  padding: 2px 8px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.06);
-}
-
-.tab-btn.active .count {
-  background: var(--accent-blue);
-  color: #fff;
-}
-
-/* ========== QUESTION REVIEW ========== */
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-
-.question-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.question-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.question-card:hover {
-  border-color: rgba(255,255,255,0.1);
-}
-
-.question-card.correct { border-left: 4px solid var(--accent-green); }
-.question-card.wrong { border-left: 4px solid var(--accent-red); }
-.question-card.skipped { border-left: 4px solid var(--accent-orange); }
-
-.q-header {
-  padding: 20px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  user-select: none;
-}
-
-.q-header:hover { background: rgba(255,255,255,0.02); }
-
-.q-header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.q-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-  font-weight: 600;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-sm);
-}
-
-.correct .q-num { background: var(--correct-bg); color: var(--accent-green); }
-.wrong .q-num { background: var(--wrong-bg); color: var(--accent-red); }
-.skipped .q-num { background: var(--skipped-bg); color: var(--accent-orange); }
-
-.q-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.q-subject-tag {
-  font-size: 12px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.q-text-preview {
-  font-size: 15px;
   color: var(--text-secondary);
-  max-width: 600px;
+  max-width: 500px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.q-header-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.q-time {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.q-status-badge {
+.q-status {
   font-size: 12px;
   font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
 }
 
-.badge-correct { background: var(--correct-bg); color: var(--accent-green); border: 1px solid var(--correct-border); }
-.badge-wrong { background: var(--wrong-bg); color: var(--accent-red); border: 1px solid var(--wrong-border); }
-.badge-skipped { background: var(--skipped-bg); color: var(--accent-orange); border: 1px solid var(--skipped-border); }
+.q-status.correct { background: var(--green-bg); color: var(--green); }
+.q-status.wrong { background: var(--red-bg); color: var(--red); }
+.q-status.skipped { background: var(--orange-bg); color: var(--orange); }
 
-.q-expand-icon {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  transition: transform 0.3s ease;
+.question-body {
+  display: none;
+  padding: 0 20px 20px;
+  border-top: 1px solid var(--border);
 }
 
-.question-card.expanded .q-expand-icon { transform: rotate(180deg); }
-
-/* Expanded content */
-.q-body {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.question-card.expanded .q-body {
-  max-height: 2000px;
-}
-
-.q-body-inner {
-  padding: 0 24px 24px;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.q-question-full {
-  padding: 20px;
-  background: rgba(255,255,255,0.02);
-  border-radius: var(--radius-md);
-  margin: 20px 0;
-  font-size: 15px;
-  line-height: 1.7;
-  color: var(--text-primary);
-}
+.question-card.expanded .question-body { display: block; }
+.question-card.expanded .question-header { background: var(--bg-panel); }
 
 .q-passage {
-  padding: 20px;
-  background: rgba(59,130,246,0.04);
-  border-left: 3px solid rgba(59,130,246,0.3);
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
   margin: 16px 0;
   font-size: 14px;
-  line-height: 1.8;
+  line-height: 1.7;
   color: var(--text-secondary);
-  font-style: italic;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.q-text {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 16px 0;
+  line-height: 1.6;
 }
 
 .q-options {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin: 20px 0;
+  gap: 8px;
+  margin: 16px 0;
 }
 
 .q-option {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 18px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-subtle);
-  font-size: 14px;
-  line-height: 1.6;
-  transition: all 0.2s ease;
-}
-
-.q-option-letter {
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 600;
-  font-size: 13px;
-  width: 28px;
-  height: 28px;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  flex-shrink: 0;
-  background: rgba(255,255,255,0.05);
-  color: var(--text-secondary);
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  font-size: 14px;
 }
 
-.q-option.is-correct {
-  background: var(--correct-bg);
-  border-color: var(--correct-border);
-}
-
-.q-option.is-correct .q-option-letter {
-  background: var(--accent-green);
-  color: #fff;
+.q-option.correct-answer {
+  background: var(--green-bg);
+  border-color: rgba(16,185,129,0.3);
 }
 
 .q-option.user-wrong {
-  background: var(--wrong-bg);
-  border-color: var(--wrong-border);
+  background: var(--red-bg);
+  border-color: rgba(239,68,68,0.3);
 }
 
-.q-option.user-wrong .q-option-letter {
-  background: var(--accent-red);
-  color: #fff;
-}
-
-/* Explanation Box */
-.q-explanation {
-  margin-top: 20px;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.q-explanation-header {
-  background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(59,130,246,0.1));
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  font-size: 15px;
-  border: 1px solid rgba(139,92,246,0.2);
-  border-bottom: none;
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
-}
-
-.q-explanation-header svg { color: var(--accent-purple); }
-
-.q-explanation-body {
-  padding: 20px;
-  background: rgba(139,92,246,0.04);
-  border: 1px solid rgba(139,92,246,0.15);
-  border-top: none;
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
-  font-size: 14px;
-  line-height: 1.8;
-  color: var(--text-secondary);
-}
-
-.q-explanation-body strong {
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.q-explanation-body .key-concept {
-  display: inline-flex;
-  padding: 2px 10px;
-  background: rgba(139,92,246,0.1);
-  border-radius: 4px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  color: var(--accent-purple);
-  margin: 0 2px;
-}
-
-.q-explanation-steps {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px dashed rgba(139,92,246,0.15);
-}
-
-.explanation-step {
-  display: flex;
-  gap: 12px;
-  padding: 8px 0;
-}
-
-.step-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accent-purple);
+.q-option-letter {
   width: 24px;
   height: 24px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(139,92,246,0.1);
-  border-radius: 6px;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.step-text {
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--text-secondary);
-}
-
-.difficulty-tag {
-  display: inline-flex;
-  padding: 3px 10px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-left: 8px;
-}
-
-.diff-easy { background: rgba(16,185,129,0.1); color: var(--accent-green); }
-.diff-medium { background: rgba(245,158,11,0.1); color: var(--accent-orange); }
-.diff-hard { background: rgba(239,68,68,0.1); color: var(--accent-red); }
-
-/* ========== EMPTY STATE ========== */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--bg-panel);
   color: var(--text-muted);
 }
 
-.empty-state svg { margin-bottom: 16px; opacity: 0.4; }
-.empty-state p { font-size: 15px; }
-
-/* ========== FOOTER ACTIONS ========== */
-.footer-actions {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  margin-top: 48px;
-  padding-bottom: 48px;
+.q-option.correct-answer .q-option-letter {
+  background: var(--green);
+  color: #fff;
 }
 
-.btn-lg {
-  padding: 14px 32px;
-  font-size: 15px;
-  border-radius: var(--radius-md);
+.q-option.user-wrong .q-option-letter {
+  background: var(--red);
+  color: #fff;
 }
 
-/* ========== PRINT STYLES ========== */
-@media print {
-  .top-header, .tabs-nav, .footer-actions, .btn { display: none; }
-  body { background: #fff; color: #000; }
-  .main-container { max-width: 100%; padding: 20px; }
-  .question-card { break-inside: avoid; }
-  .q-body { max-height: none !important; }
+.q-explanation {
+  background: rgba(99,102,241,0.1);
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-top: 16px;
 }
 
-/* ========== RESPONSIVE ========== */
-@media (max-width: 1024px) {
-  .score-hero { grid-template-columns: 1fr; text-align: center; padding: 32px; }
-  .score-details { grid-template-columns: repeat(2, 1fr); }
-  .subjects-grid { grid-template-columns: repeat(2, 1fr); }
+.q-explanation-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-@media (max-width: 640px) {
-  .main-container { padding: 16px; }
-  .score-hero { padding: 24px; }
-  .score-details { grid-template-columns: 1fr; }
-  .subjects-grid { grid-template-columns: 1fr; }
-  .q-text-preview { max-width: 200px; }
+.q-explanation p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
 }
 
-/* ========== ANIMATIONS ========== */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-in {
-  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  opacity: 0;
-}
-
-.delay-1 { animation-delay: 0.1s; }
-.delay-2 { animation-delay: 0.2s; }
-.delay-3 { animation-delay: 0.3s; }
-.delay-4 { animation-delay: 0.4s; }
-.delay-5 { animation-delay: 0.5s; }
-
-/* Score counter animation */
-@keyframes countUp {
-  from { opacity: 0; transform: scale(0.5); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.score-number {
-  animation: countUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
-  opacity: 0;
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .container { padding: 20px 16px; }
+  .score-card { padding: 24px; }
 }
 </style>
 </head>
 <body>
 
-<!-- TOP HEADER -->
-<header class="top-header">
-  <div class="logo-area">
-    <div class="logo-mark">S</div>
-    <div class="logo-text">Smart<span>Selective</span></div>
-  </div>
-  <div class="header-actions">
-    <button class="btn btn-ghost" onclick="window.print()">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>
-      Print Report
-    </button>
-    <button class="btn btn-ghost" onclick="downloadPDF()">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-      Download PDF
-    </button>
-    <button class="btn btn-primary" onclick="location.href='dashboard.html'">
-      ← Back to Dashboard
-    </button>
-  </div>
-</header>
-
-<!-- MAIN CONTENT -->
-<div class="main-container">
-
-  <!-- SCORE HERO -->
-  <section class="score-hero animate-in" id="scoreHero">
-    <div class="score-circle-wrapper">
-      <div class="score-circle">
-        <svg viewBox="0 0 220 220">
-          <circle class="bg-ring" cx="110" cy="110" r="96"/>
-          <circle class="score-ring" id="scoreRing" cx="110" cy="110" r="96"
-            stroke-dasharray="603.19" stroke-dashoffset="603.19"/>
-        </svg>
-        <div class="score-inner">
-          <div class="score-number" id="scoreDisplay">0</div>
-          <div class="score-total" id="scoreTotalDisplay">/ 30</div>
-        </div>
-      </div>
-      <div class="score-grade" id="scoreGrade">Loading...</div>
-    </div>
-
-    <div class="score-details">
-      <div class="detail-card">
-        <div class="detail-label">Correct Answers</div>
-        <div class="detail-value" id="correctCount" style="color:var(--accent-green)">0</div>
-        <div class="detail-sub" id="correctPct">0% accuracy</div>
-      </div>
-      <div class="detail-card">
-        <div class="detail-label">Wrong Answers</div>
-        <div class="detail-value" id="wrongCount" style="color:var(--accent-red)">0</div>
-        <div class="detail-sub" id="wrongPct">0% of total</div>
-      </div>
-      <div class="detail-card">
-        <div class="detail-label">Skipped</div>
-        <div class="detail-value" id="skippedCount" style="color:var(--accent-orange)">0</div>
-        <div class="detail-sub" id="skippedPct">0% of total</div>
-      </div>
-      <div class="detail-card">
-        <div class="detail-label">Time Taken</div>
-        <div class="detail-value" id="totalTime" style="color:var(--accent-cyan)">0:00</div>
-        <div class="detail-sub" id="avgTime">Avg. 0s per question</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SUBJECT BREAKDOWN -->
-  <section class="animate-in delay-1">
-    <div class="section-title">
-      <div class="icon" style="background:rgba(59,130,246,0.1)">📊</div>
-      Subject Breakdown
-    </div>
-    <div class="subjects-grid" id="subjectsGrid"></div>
-  </section>
-
-  <!-- TIME ANALYSIS -->
-  <section class="time-section animate-in delay-2">
-    <div class="section-title">
-      <div class="icon" style="background:rgba(6,182,212,0.1)">⏱️</div>
-      Time Per Question
-    </div>
-    <div class="time-bars" id="timeBars"></div>
-    <div class="time-legend">
-      <div class="time-legend-item"><div class="time-legend-dot" style="background:var(--accent-green)"></div> Correct</div>
-      <div class="time-legend-item"><div class="time-legend-dot" style="background:var(--accent-red)"></div> Wrong</div>
-      <div class="time-legend-item"><div class="time-legend-dot" style="background:var(--accent-orange)"></div> Skipped</div>
-    </div>
-  </section>
-
-  <!-- TAB NAVIGATION -->
-  <div class="tabs-nav animate-in delay-3">
-    <button class="tab-btn active" data-tab="all" onclick="switchTab('all')">
-      All Questions <span class="count" id="allCount">0</span>
-    </button>
-    <button class="tab-btn" data-tab="wrong" onclick="switchTab('wrong')">
-      ❌ Wrong <span class="count" id="wrongTabCount">0</span>
-    </button>
-    <button class="tab-btn" data-tab="correct" onclick="switchTab('correct')">
-      ✅ Correct <span class="count" id="correctTabCount">0</span>
-    </button>
-    <button class="tab-btn" data-tab="skipped" onclick="switchTab('skipped')">
-      ⏭️ Skipped <span class="count" id="skippedTabCount">0</span>
-    </button>
-  </div>
-
-  <!-- QUESTION REVIEW -->
-  <div class="tab-content active" id="tab-all">
-    <div class="question-list" id="allQuestions"></div>
-  </div>
-  <div class="tab-content" id="tab-wrong">
-    <div class="question-list" id="wrongQuestions"></div>
-  </div>
-  <div class="tab-content" id="tab-correct">
-    <div class="question-list" id="correctQuestions"></div>
-  </div>
-  <div class="tab-content" id="tab-skipped">
-    <div class="question-list" id="skippedQuestions"></div>
-  </div>
-
-  <!-- FOOTER -->
-  <div class="footer-actions animate-in delay-5">
-    <button class="btn btn-lg btn-ghost" onclick="location.href='dashboard.html'">Back to Dashboard</button>
-    <button class="btn btn-lg btn-success" onclick="retryWrong()">🔄 Retry Wrong Questions</button>
-    <button class="btn btn-lg btn-primary" onclick="startNextTest()">Next Test →</button>
-  </div>
-
+<!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-logo">Smart<em>Selective</em></div>
+  <div class="spinner"></div>
 </div>
 
+<div id="app" style="display:none">
+  <!-- Header -->
+  <header class="header">
+    <a href="/dashboard.html" class="logo">Smart<em>Selective</em></a>
+    <a href="/dashboard.html" class="header-btn">← Back to Dashboard</a>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Score Card -->
+    <div class="score-card">
+      <div class="score-badge" id="scoreBadge">Excellent!</div>
+      <div class="score-ring">
+        <svg viewBox="0 0 100 100">
+          <circle class="score-ring-bg" cx="50" cy="50" r="42"></circle>
+          <circle class="score-ring-fill" id="scoreRing" cx="50" cy="50" r="42" 
+                  stroke-dasharray="264" stroke-dashoffset="264"></circle>
+        </svg>
+        <div class="score-value">
+          <div class="score-percent" id="scorePercent">0%</div>
+          <div class="score-label">Score</div>
+        </div>
+      </div>
+      <div class="test-title" id="testTitle">Reading Comprehension</div>
+      <div class="test-meta" id="testMeta">Completed on Feb 8, 2026</div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="statCorrect" style="color:var(--green)">0</div>
+        <div class="stat-label">Correct</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statWrong" style="color:var(--red)">0</div>
+        <div class="stat-label">Wrong</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statSkipped" style="color:var(--orange)">0</div>
+        <div class="stat-label">Skipped</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statTime">00:00</div>
+        <div class="stat-label">Time Used</div>
+      </div>
+    </div>
+
+    <!-- Questions Review -->
+    <div class="section-title">📋 Question Review</div>
+    <div class="tabs">
+      <button class="tab active" data-filter="all">All</button>
+      <button class="tab" data-filter="wrong">Wrong</button>
+      <button class="tab" data-filter="correct">Correct</button>
+      <button class="tab" data-filter="skipped">Skipped</button>
+    </div>
+    <div id="questionsList"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="shared.js"></script>
 <script>
-// ============================================================
-//  DEMO DATA - Replace with actual test results from localStorage / API
-// ============================================================
-const DEMO_DATA = {
-  testName: "Week 1 - Full Test",
-  totalQuestions: 30,
-  timeLimit: 1800, // 30 min
-  subjects: [
-    { name: "Reading", color: "#3b82f6", icon: "📖" },
-    { name: "Mathematics", color: "#10b981", icon: "🔢" },
-    { name: "Thinking Skills", color: "#8b5cf6", icon: "🧩" },
-    { name: "Writing", color: "#f59e0b", icon: "✍️" }
-  ],
-  questions: [
-    // READING (Q1-8)
-    {
-      id: 1, subject: "Reading", difficulty: "medium",
-      passage: "The ancient library of Alexandria, once the largest in the known world, housed scrolls containing the accumulated knowledge of Greek, Egyptian, and Persian civilisations. Scholars travelled thousands of miles to study within its walls, making it the intellectual heart of the ancient world. Its eventual destruction remains one of history's greatest losses.",
-      question: "According to the passage, what made the Library of Alexandria the 'intellectual heart' of the ancient world?",
-      options: [
-        "It was the oldest library ever built",
-        "Scholars from far away came to study there",
-        "It contained only Greek manuscripts",
-        "It was located in the capital city"
-      ],
-      correctAnswer: 1, userAnswer: 1, timeSpent: 45,
-      explanation: "The passage states that 'scholars travelled thousands of miles to study within its walls', directly explaining why it was called the intellectual heart. The gathering of scholars from distant places made it a center of learning.",
-      steps: [
-        "Identify the key phrase: 'intellectual heart of the ancient world'",
-        "Find what the passage links to this description — scholars travelling there",
-        "Option B directly matches: scholars from far away came to study",
-        "Options A, C, D are not supported by the passage text"
-      ]
-    },
-    {
-      id: 2, subject: "Reading", difficulty: "hard",
-      passage: "Despite the widespread belief that chameleons change colour primarily for camouflage, recent research reveals that their colour shifts are mainly driven by social signalling and temperature regulation. A dominant male, for instance, will display vibrant hues to assert territory, while a submissive individual turns darker to avoid confrontation.",
-      question: "What is the primary purpose of colour change in chameleons, according to the passage?",
-      options: [
-        "To hide from predators in their environment",
-        "To attract mates during breeding season",
-        "For social communication and body temperature control",
-        "To blend in with flowers and leaves"
-      ],
-      correctAnswer: 2, userAnswer: 0, timeSpent: 62,
-      explanation: "The passage explicitly challenges the camouflage assumption. It states colour changes are 'mainly driven by social signalling and temperature regulation'. The examples of dominant vs submissive males demonstrate social communication use.",
-      steps: [
-        "Notice the contrast word 'Despite' — the passage corrects a common misconception",
-        "The true reason is stated: 'social signalling and temperature regulation'",
-        "Option C combines both purposes mentioned in the passage",
-        "Option A is explicitly described as a misconception ('widespread belief')"
-      ]
-    },
-    {
-      id: 3, subject: "Reading", difficulty: "easy",
-      question: "Which word is closest in meaning to 'accumulated' as used in the passage?",
-      options: ["Scattered", "Gathered", "Ancient", "Written"],
-      correctAnswer: 1, userAnswer: 1, timeSpent: 18,
-      explanation: "'Accumulated' means gathered or collected over time. In context, the library had gathered knowledge from multiple civilisations over many years.",
-      steps: [
-        "'Accumulated' comes from Latin 'accumulare' — to heap up",
-        "Context: knowledge was collected from Greek, Egyptian, and Persian sources",
-        "'Gathered' is the closest synonym",
-        "'Scattered' is the opposite meaning"
-      ]
-    },
-    {
-      id: 4, subject: "Reading", difficulty: "medium",
-      question: "What tone does the author convey about the destruction of the library?",
-      options: ["Indifference", "Deep regret", "Anger", "Curiosity"],
-      correctAnswer: 1, userAnswer: 1, timeSpent: 35,
-      explanation: "The phrase 'one of history's greatest losses' conveys deep regret. The word 'greatest' intensifies the sense of loss, while the historical framing shows respectful mourning rather than anger.",
-      steps: [
-        "Look at word choice: 'greatest losses' indicates strong negative emotion",
-        "Compare options: regret fits the tone of respectful mourning",
-        "Anger would use more aggressive language",
-        "Indifference contradicts calling it a 'greatest loss'"
-      ]
-    },
-    {
-      id: 5, subject: "Reading", difficulty: "hard",
-      passage: "Marine biologists have discovered that octopuses exhibit remarkably sophisticated problem-solving abilities. In laboratory experiments, octopuses have been observed unscrewing jars from the inside, navigating complex mazes, and even using coconut shells as portable shelters — behaviour previously thought unique to vertebrates.",
-      question: "The mention of coconut shell usage primarily serves to:",
-      options: [
-        "Show that octopuses live near tropical beaches",
-        "Demonstrate tool use, a behaviour once thought exclusive to vertebrates",
-        "Prove that octopuses are smarter than all vertebrates",
-        "Explain how octopuses protect themselves from predators"
-      ],
-      correctAnswer: 1, userAnswer: 2, timeSpent: 78,
-      explanation: "The coconut shell example is listed alongside other sophisticated behaviours and is explicitly connected to the clause 'behaviour previously thought unique to vertebrates'. This makes it an example of tool use that challenges assumptions about animal intelligence.",
-      steps: [
-        "The coconut shell is one of three examples listed after 'problem-solving abilities'",
-        "The dash introduces a key qualifier: 'behaviour previously thought unique to vertebrates'",
-        "This connects to option B — demonstrating tool use that was unexpected",
-        "Option C goes too far ('smarter than all') and isn't supported"
-      ]
-    },
-    {
-      id: 6, subject: "Reading", difficulty: "easy",
-      question: "In the marine biology passage, what does the word 'sophisticated' most likely mean?",
-      options: ["Simple", "Advanced and complex", "Underwater", "Quick"],
-      correctAnswer: 1, userAnswer: 1, timeSpent: 14,
-      explanation: "'Sophisticated' means advanced and complex. The context of problem-solving, maze navigation, and tool use all demonstrate complexity.",
-      steps: ["Context clues: unscrewing jars, navigating mazes, using tools", "These are all complex behaviours → 'sophisticated' = advanced and complex"]
-    },
-    {
-      id: 7, subject: "Reading", difficulty: "medium",
-      question: "Why does the author include laboratory experiments as evidence?",
-      options: [
-        "To make the passage seem more scientific",
-        "To provide verifiable, controlled evidence of octopus intelligence",
-        "To show that octopuses are kept in labs",
-        "To criticise animal testing practices"
-      ],
-      correctAnswer: 1, userAnswer: 1, timeSpent: 42,
-      explanation: "Laboratory experiments provide controlled, repeatable evidence that strengthens the scientific claims about octopus intelligence. This is a standard scientific writing technique.",
-      steps: ["Scientific passages use experiments as evidence", "Lab settings allow controlled observation", "Option B describes this function accurately"]
-    },
-    {
-      id: 8, subject: "Reading", difficulty: "hard",
-      question: "Which statement best summarises the author's argument in the octopus passage?",
-      options: [
-        "Octopuses are the most intelligent sea creatures",
-        "Octopuses display cognitive abilities that challenge assumptions about invertebrate intelligence",
-        "Laboratory testing is the best way to study animals",
-        "Vertebrates and invertebrates have equal intelligence"
-      ],
-      correctAnswer: 1, userAnswer: 1, timeSpent: 55,
-      explanation: "The passage presents evidence of sophisticated problem-solving in octopuses and notes these behaviours were 'previously thought unique to vertebrates'. This challenges, rather than equalises, assumptions about invertebrate cognition.",
-      steps: [
-        "Main idea: octopuses show unexpected cognitive abilities",
-        "Key qualifier: 'previously thought unique to vertebrates' = challenging assumptions",
-        "Option B captures both elements accurately",
-        "Option D overstates — the passage challenges assumptions without claiming equality"
-      ]
-    },
-    // MATHEMATICS (Q9-16)
-    {
-      id: 9, subject: "Mathematics", difficulty: "easy",
-      question: "What is 3/4 + 2/3?",
-      options: ["5/7", "17/12", "1 5/12", "5/12"],
-      correctAnswer: 2, userAnswer: 2, timeSpent: 30,
-      explanation: "To add fractions with different denominators, find the LCD (12). Convert: 3/4 = 9/12 and 2/3 = 8/12. Sum: 9/12 + 8/12 = 17/12 = 1 5/12.",
-      steps: ["LCD of 4 and 3 = 12", "3/4 = 9/12", "2/3 = 8/12", "9/12 + 8/12 = 17/12 = 1 5/12"]
-    },
-    {
-      id: 10, subject: "Mathematics", difficulty: "medium",
-      question: "A rectangular garden has a perimeter of 36 metres. If the length is twice the width, what is the area?",
-      options: ["72 m²", "54 m²", "36 m²", "48 m²"],
-      correctAnswer: 0, userAnswer: 0, timeSpent: 65,
-      explanation: "Let width = w, length = 2w. Perimeter: 2(w + 2w) = 36 → 6w = 36 → w = 6m, length = 12m. Area = 6 × 12 = 72 m².",
-      steps: ["Let width = w, length = 2w", "Perimeter formula: 2(l + w) = 36", "2(2w + w) = 36 → 6w = 36 → w = 6", "Area = 6 × 12 = 72 m²"]
-    },
-    {
-      id: 11, subject: "Mathematics", difficulty: "hard",
-      question: "A shop offers 20% off, then an additional 15% off the discounted price. What is the total percentage discount?",
-      options: ["35%", "32%", "30%", "28%"],
-      correctAnswer: 1, userAnswer: 0, timeSpent: 80,
-      explanation: "Successive discounts are multiplicative, not additive. After 20% off: pay 80%. After 15% off that: pay 85% of 80% = 68%. Total discount = 100% - 68% = 32%.",
-      steps: [
-        "First discount: 100% × 0.80 = 80% of original",
-        "Second discount: 80% × 0.85 = 68% of original",
-        "Total discount = 100% - 68% = 32%",
-        "Common mistake: adding 20% + 15% = 35% (incorrect because discounts multiply)"
-      ]
-    },
-    {
-      id: 12, subject: "Mathematics", difficulty: "medium",
-      question: "If 5x - 3 = 2x + 9, what is the value of x?",
-      options: ["2", "3", "4", "6"],
-      correctAnswer: 2, userAnswer: 2, timeSpent: 28,
-      explanation: "Subtract 2x from both sides: 3x - 3 = 9. Add 3: 3x = 12. Divide by 3: x = 4.",
-      steps: ["5x - 3 = 2x + 9", "5x - 2x = 9 + 3", "3x = 12", "x = 4"]
-    },
-    {
-      id: 13, subject: "Mathematics", difficulty: "hard",
-      question: "A train travels 120 km at 60 km/h, then 180 km at 90 km/h. What is the average speed for the entire journey?",
-      options: ["72 km/h", "75 km/h", "80 km/h", "78 km/h"],
-      correctAnswer: 1, userAnswer: 2, timeSpent: 95,
-      explanation: "Average speed = Total distance / Total time. Distance = 120 + 180 = 300 km. Time = 120/60 + 180/90 = 2 + 2 = 4 hours. Average speed = 300/4 = 75 km/h.",
-      steps: [
-        "Total distance = 120 + 180 = 300 km",
-        "Time for first part: 120 ÷ 60 = 2 hours",
-        "Time for second part: 180 ÷ 90 = 2 hours",
-        "Average speed = 300 ÷ 4 = 75 km/h",
-        "Common mistake: averaging 60 and 90 to get 75 (coincidentally correct here, but the method is wrong)"
-      ]
-    },
-    {
-      id: 14, subject: "Mathematics", difficulty: "easy",
-      question: "What is 15% of 240?",
-      options: ["32", "34", "36", "38"],
-      correctAnswer: 2, userAnswer: 2, timeSpent: 15,
-      explanation: "15% of 240 = 0.15 × 240 = 36. Quick method: 10% = 24, 5% = 12, total = 36.",
-      steps: ["10% of 240 = 24", "5% of 240 = 12", "15% = 24 + 12 = 36"]
-    },
-    {
-      id: 15, subject: "Mathematics", difficulty: "medium",
-      question: "A bag contains 3 red, 5 blue, and 2 green marbles. What is the probability of drawing a blue marble?",
-      options: ["1/3", "1/2", "2/5", "3/10"],
-      correctAnswer: 1, userAnswer: 1, timeSpent: 22,
-      explanation: "Total marbles = 3 + 5 + 2 = 10. Blue marbles = 5. Probability = 5/10 = 1/2.",
-      steps: ["Total = 3 + 5 + 2 = 10", "P(blue) = 5/10 = 1/2"]
-    },
-    {
-      id: 16, subject: "Mathematics", difficulty: "hard",
-      question: "The ratio of boys to girls in a class is 3:5. If there are 40 students total, how many more girls than boys are there?",
-      options: ["5", "8", "10", "15"],
-      correctAnswer: 2, userAnswer: null, timeSpent: 0,
-      explanation: "Total parts = 3 + 5 = 8. Each part = 40/8 = 5. Boys = 3 × 5 = 15. Girls = 5 × 5 = 25. Difference = 25 - 15 = 10.",
-      steps: ["Ratio 3:5 means 8 total parts", "Each part = 40 ÷ 8 = 5 students", "Boys = 15, Girls = 25", "Difference = 10"]
-    },
-    // THINKING SKILLS (Q17-24)
-    {
-      id: 17, subject: "Thinking Skills", difficulty: "medium",
-      question: "If all Bloops are Razzies, and all Razzies are Lazzies, which must be true?",
-      options: [
-        "All Lazzies are Bloops",
-        "All Bloops are Lazzies",
-        "All Razzies are Bloops",
-        "Some Lazzies are not Razzies"
-      ],
-      correctAnswer: 1, userAnswer: 1, timeSpent: 38,
-      explanation: "This is a transitive logic chain: Bloops → Razzies → Lazzies. Therefore all Bloops must also be Lazzies. The reverse is not necessarily true.",
-      steps: ["Bloops ⊆ Razzies (all Bloops are Razzies)", "Razzies ⊆ Lazzies (all Razzies are Lazzies)", "Therefore Bloops ⊆ Lazzies (all Bloops are Lazzies)", "Option A reverses the logic and is not valid"]
-    },
-    {
-      id: 18, subject: "Thinking Skills", difficulty: "hard",
-      question: "Which number comes next in the sequence: 2, 6, 14, 30, ?",
-      options: ["46", "58", "62", "64"],
-      correctAnswer: 2, userAnswer: 2, timeSpent: 72,
-      explanation: "Each term follows the pattern: multiply by 2, then add 2. So 2→6 (×2+2), 6→14 (×2+2), 14→30 (×2+2), 30→62 (×2+2).",
-      steps: ["2 × 2 + 2 = 6 ✓", "6 × 2 + 2 = 14 ✓", "14 × 2 + 2 = 30 ✓", "30 × 2 + 2 = 62 ✓"]
-    },
-    {
-      id: 19, subject: "Thinking Skills", difficulty: "easy",
-      question: "If Monday is 2 days after a holiday, on what day is the holiday?",
-      options: ["Wednesday", "Saturday", "Sunday", "Friday"],
-      correctAnswer: 1, userAnswer: 1, timeSpent: 12,
-      explanation: "Count backwards 2 days from Monday: Monday → Sunday → Saturday.",
-      steps: ["Monday minus 1 day = Sunday", "Sunday minus 1 day = Saturday", "The holiday is Saturday"]
-    },
-    {
-      id: 20, subject: "Thinking Skills", difficulty: "medium",
-      question: "A cube is painted red on all sides, then cut into 27 equal smaller cubes. How many small cubes have exactly 2 painted faces?",
-      options: ["6", "8", "12", "18"],
-      correctAnswer: 2, userAnswer: 0, timeSpent: 88,
-      explanation: "In a 3×3×3 cube: corner cubes have 3 painted faces, edge cubes (not corners) have 2 painted faces, face-centre cubes have 1, and the centre cube has 0. Each edge has 1 middle cube, and a cube has 12 edges, so 12 cubes have exactly 2 painted faces.",
-      steps: [
-        "A 3×3×3 cube has 27 small cubes total",
-        "3 painted faces: 8 corner cubes",
-        "2 painted faces: edge cubes (not corners) = 12 edges × 1 per edge = 12",
-        "1 painted face: 6 face centres",
-        "0 painted faces: 1 centre cube"
-      ]
-    },
-    {
-      id: 21, subject: "Thinking Skills", difficulty: "hard",
-      question: "Five friends are sitting in a row. Anna is not next to Ben. Charlie is between Diana and Edward. Diana is at one end. Who is sitting in the middle?",
-      options: ["Anna", "Ben", "Charlie", "Edward"],
-      correctAnswer: 2, userAnswer: 2, timeSpent: 105,
-      explanation: "Diana is at one end. Charlie is between Diana and Edward, so the order starts: Diana, Charlie, Edward. Anna and Ben fill positions 4 and 5, with Anna not next to Ben (but they must be next to each other in remaining spots). Wait — re-reading: Anna not next to Ben means one arrangement works: D, C, E, A, B or D, C, E, B, A. Charlie is position 3 = middle.",
-      steps: [
-        "Diana is at position 1 (one end)",
-        "Charlie is between Diana and Edward → D, C, E at positions 1, 2, 3",
-        "Anna and Ben fill positions 4 and 5",
-        "Position 3 (middle of 5) = Charlie"
-      ]
-    },
-    {
-      id: 22, subject: "Thinking Skills", difficulty: "medium",
-      question: "Which shape completes the pattern? ○ △ □ ○ △ □ ○ △ ?",
-      options: ["○", "△", "□", "◇"],
-      correctAnswer: 2, userAnswer: 2, timeSpent: 8,
-      explanation: "The pattern repeats every 3 shapes: ○ △ □. Position 9 = 9 ÷ 3 = 3rd in cycle = □.",
-      steps: ["Pattern cycle: ○ △ □ (length 3)", "Position 9: 9 mod 3 = 0 → last in cycle = □"]
-    },
-    {
-      id: 23, subject: "Thinking Skills", difficulty: "easy",
-      question: "If you fold a square piece of paper in half twice and cut a corner, how many holes appear when you unfold it?",
-      options: ["1", "2", "4", "8"],
-      correctAnswer: 2, userAnswer: 2, timeSpent: 25,
-      explanation: "Folding in half twice creates 4 layers. Cutting through all layers creates 4 identical holes when unfolded (one per layer, symmetrically placed).",
-      steps: ["First fold: 2 layers", "Second fold: 4 layers", "One cut through 4 layers = 4 holes when unfolded"]
-    },
-    {
-      id: 24, subject: "Thinking Skills", difficulty: "hard",
-      question: "A clock shows 3:15. What is the exact angle between the hour and minute hands?",
-      options: ["0°", "7.5°", "15°", "22.5°"],
-      correctAnswer: 1, userAnswer: 0, timeSpent: 70,
-      explanation: "At 3:15, the minute hand is at 90° (pointing at 3). The hour hand has moved past the 3: it moves 0.5° per minute, so in 15 minutes it's moved 7.5° past the 3 o'clock position (also 90°). So hour hand is at 97.5°. Angle between them = 7.5°.",
-      steps: [
-        "Minute hand at 15 min = 15 × 6° = 90° from 12",
-        "Hour hand at 3:00 = 90° from 12",
-        "Hour hand moves 0.5° per minute: 15 × 0.5° = 7.5° extra",
-        "Hour hand position = 90° + 7.5° = 97.5°",
-        "Angle between hands = 97.5° - 90° = 7.5°"
-      ]
-    },
-    // WRITING (Q25-30)
-    {
-      id: 25, subject: "Writing", difficulty: "easy",
-      question: "Which sentence uses correct punctuation?",
-      options: [
-        "The dog, who was very old slept all day.",
-        "The dog who was very old, slept all day.",
-        "The dog, who was very old, slept all day.",
-        "The dog who was very old slept, all day."
-      ],
-      correctAnswer: 2, userAnswer: 2, timeSpent: 20,
-      explanation: "'Who was very old' is a non-essential (parenthetical) clause that adds extra information. It must be enclosed in a pair of commas.",
-      steps: ["'Who was very old' is a non-restrictive relative clause", "Non-restrictive clauses need commas on both sides", "Option C correctly uses paired commas"]
-    },
-    {
-      id: 26, subject: "Writing", difficulty: "medium",
-      question: "Choose the best word to complete: 'The scientist's theory was _____ by multiple experiments.'",
-      options: ["corroborated", "exaggerated", "eliminated", "understated"],
-      correctAnswer: 0, userAnswer: 0, timeSpent: 32,
-      explanation: "'Corroborated' means confirmed or supported by evidence. Multiple experiments supporting a theory = corroboration.",
-      steps: ["Context: experiments support a theory", "'Corroborated' = confirmed by evidence → fits perfectly", "Other options don't describe a supporting relationship"]
-    },
-    {
-      id: 27, subject: "Writing", difficulty: "hard",
-      question: "Which sentence demonstrates the best use of parallel structure?",
-      options: [
-        "She likes swimming, to run, and biking.",
-        "She likes swimming, running, and biking.",
-        "She likes to swim, running, and to bike.",
-        "She likes swimming, running, and to bike."
-      ],
-      correctAnswer: 1, userAnswer: 3, timeSpent: 48,
-      explanation: "Parallel structure requires consistent grammatical form in a list. Option B uses gerunds throughout: swimming, running, biking. Mixing forms (infinitives and gerunds) breaks parallelism.",
-      steps: [
-        "Identify the list items in each option",
-        "Option B: swimming, running, biking — all gerunds (-ing form) ✓",
-        "Option A: swimming, to run, biking — mixed forms ✗",
-        "Option D: swimming, running, to bike — mixed forms ✗"
-      ]
-    },
-    {
-      id: 28, subject: "Writing", difficulty: "medium",
-      question: "Which is the most effective topic sentence for a paragraph about ocean pollution?",
-      options: [
-        "The ocean is very big and has lots of water.",
-        "Ocean pollution poses an urgent threat to marine ecosystems worldwide.",
-        "Some people throw rubbish in the ocean.",
-        "There are many types of fish in the ocean."
-      ],
-      correctAnswer: 1, userAnswer: 1, timeSpent: 25,
-      explanation: "A strong topic sentence introduces the main idea clearly and sets up the paragraph's argument. Option B is specific, focused, and establishes urgency.",
-      steps: ["Topic sentence should state the paragraph's main claim", "Option B: clear, specific, arguable, and focused", "Other options are too vague or off-topic"]
-    },
-    {
-      id: 29, subject: "Writing", difficulty: "easy",
-      question: "Identify the error: 'Their going to the park, but there dog isn't aloud.'",
-      options: [
-        "Their → They're, there → their, aloud → allowed",
-        "Their → They're, aloud → allowed",
-        "There → Their, aloud → allowed",
-        "Their → There, aloud → allowed"
-      ],
-      correctAnswer: 0, userAnswer: 0, timeSpent: 30,
-      explanation: "Three errors: 'Their' should be 'They're' (they are), 'there' should be 'their' (possessive), and 'aloud' (spoken out) should be 'allowed' (permitted).",
-      steps: [
-        "'Their going' → 'They're going' (they are)",
-        "'there dog' → 'their dog' (belonging to them)",
-        "'aloud' → 'allowed' (permitted, not out loud)"
-      ]
-    },
-    {
-      id: 30, subject: "Writing", difficulty: "hard",
-      question: "Which revision most improves this sentence: 'The really, really big storm made the boat go up and down a lot on the water.'?",
-      options: [
-        "The very large storm made the boat move considerably on the water.",
-        "The ferocious storm tossed the vessel violently across the churning sea.",
-        "The storm was big and the boat moved on the water a lot.",
-        "The really big storm made the boat go up and down on the ocean."
-      ],
-      correctAnswer: 1, userAnswer: null, timeSpent: 0,
-      explanation: "Option B uses precise, vivid language: 'ferocious' (specific adjective), 'tossed' (active verb), 'violently' (specific adverb), 'churning sea' (vivid imagery). This demonstrates strong word choice — a key writing skill for selective school tests.",
-      steps: [
-        "Original problem: vague language ('really big', 'a lot', 'go up and down')",
-        "Option B replaces every vague element with a precise, vivid word",
-        "'Ferocious' > 'really big', 'tossed violently' > 'go up and down a lot'",
-        "This demonstrates the 'show don't tell' principle"
-      ]
-    }
-  ]
+(function() {
+'use strict';
+
+var SS = window.SS_Shared;
+
+var state = {
+  attempt: null,
+  test: null,
+  questions: [],
+  filter: 'all'
 };
 
-// ============================================================
-//  INITIALIZATION & RENDERING
-// ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-  // Try to load real results from localStorage, fall back to demo
-  const data = loadResults() || DEMO_DATA;
-  renderResults(data);
-});
-
-function loadResults() {
-  try {
-    const stored = localStorage.getItem('smartselective_results');
-    return stored ? JSON.parse(stored) : null;
-  } catch { return null; }
-}
-
-function renderResults(data) {
-  const questions = data.questions;
-  const total = questions.length;
-
-  // Calculate stats
-  const correct = questions.filter(q => q.userAnswer === q.correctAnswer).length;
-  const skipped = questions.filter(q => q.userAnswer === null || q.userAnswer === undefined).length;
-  const wrong = total - correct - skipped;
-  const totalTime = questions.reduce((sum, q) => sum + (q.timeSpent || 0), 0);
-  const avgTime = Math.round(totalTime / total);
-  const pct = Math.round((correct / total) * 100);
-
-  // Animate score ring
-  const ring = document.getElementById('scoreRing');
-  const circumference = 2 * Math.PI * 96;
-  const offset = circumference - (correct / total) * circumference;
-  const scoreColor = pct >= 80 ? 'var(--accent-green)' : pct >= 60 ? 'var(--accent-blue)' : pct >= 40 ? 'var(--accent-orange)' : 'var(--accent-red)';
-  ring.style.stroke = scoreColor;
-  setTimeout(() => { ring.style.strokeDashoffset = offset; }, 100);
-
-  // Score display
-  animateNumber('scoreDisplay', correct);
-  document.getElementById('scoreTotalDisplay').textContent = `/ ${total}`;
-
-  // Grade
-  const gradeEl = document.getElementById('scoreGrade');
-  if (pct >= 80) { gradeEl.textContent = '🏆 Excellent'; gradeEl.className = 'score-grade grade-excellent'; }
-  else if (pct >= 60) { gradeEl.textContent = '👍 Good'; gradeEl.className = 'score-grade grade-good'; }
-  else if (pct >= 40) { gradeEl.textContent = '📈 Average'; gradeEl.className = 'score-grade grade-average'; }
-  else { gradeEl.textContent = '💪 Keep Trying'; gradeEl.className = 'score-grade grade-poor'; }
-
-  document.getElementById('scoreDisplay').style.color = scoreColor;
-
-  // Stats
-  document.getElementById('correctCount').textContent = correct;
-  document.getElementById('correctPct').textContent = `${pct}% accuracy`;
-  document.getElementById('wrongCount').textContent = wrong;
-  document.getElementById('wrongPct').textContent = `${Math.round((wrong/total)*100)}% of total`;
-  document.getElementById('skippedCount').textContent = skipped;
-  document.getElementById('skippedPct').textContent = `${Math.round((skipped/total)*100)}% of total`;
-  document.getElementById('totalTime').textContent = formatTime(totalTime);
-  document.getElementById('avgTime').textContent = `Avg. ${avgTime}s per question`;
-
-  // Subject breakdown
-  renderSubjects(data);
-
-  // Time bars
-  renderTimeBars(questions);
-
-  // Tab counts
-  document.getElementById('allCount').textContent = total;
-  document.getElementById('wrongTabCount').textContent = wrong;
-  document.getElementById('correctTabCount').textContent = correct;
-  document.getElementById('skippedTabCount').textContent = skipped;
-
-  // Render question cards
-  renderQuestions('allQuestions', questions);
-  renderQuestions('wrongQuestions', questions.filter(q => q.userAnswer !== q.correctAnswer && q.userAnswer !== null && q.userAnswer !== undefined));
-  renderQuestions('correctQuestions', questions.filter(q => q.userAnswer === q.correctAnswer));
-  renderQuestions('skippedQuestions', questions.filter(q => q.userAnswer === null || q.userAnswer === undefined));
-}
-
-function renderSubjects(data) {
-  const grid = document.getElementById('subjectsGrid');
-  const subjectMap = {};
-
-  data.questions.forEach(q => {
-    if (!subjectMap[q.subject]) subjectMap[q.subject] = { total: 0, correct: 0, time: 0 };
-    subjectMap[q.subject].total++;
-    if (q.userAnswer === q.correctAnswer) subjectMap[q.subject].correct++;
-    subjectMap[q.subject].time += (q.timeSpent || 0);
-  });
-
-  data.subjects.forEach(sub => {
-    const stats = subjectMap[sub.name] || { total: 0, correct: 0, time: 0 };
-    const pct = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
-    const avgT = stats.total > 0 ? Math.round(stats.time / stats.total) : 0;
-    const barColor = pct >= 80 ? 'var(--accent-green)' : pct >= 60 ? 'var(--accent-blue)' : pct >= 40 ? 'var(--accent-orange)' : 'var(--accent-red)';
-
-    const card = document.createElement('div');
-    card.className = 'subject-card';
-    card.innerHTML = `
-      <div class="subject-header">
-        <div class="subject-name">${sub.icon} ${sub.name}</div>
-        <div class="subject-score-badge" style="background:${sub.color}20;color:${sub.color}">${stats.correct}/${stats.total}</div>
-      </div>
-      <div class="subject-bar-wrap">
-        <div class="subject-bar" style="width:0%;background:${barColor}" data-width="${pct}%"></div>
-      </div>
-      <div class="subject-stats">
-        <span>Accuracy: <span class="subject-stat-value">${pct}%</span></span>
-        <span>Avg: <span class="subject-stat-value">${avgT}s</span></span>
-      </div>
-    `;
-    grid.appendChild(card);
-
-    // Animate bars
-    setTimeout(() => {
-      card.querySelector('.subject-bar').style.width = pct + '%';
-    }, 300);
-  });
-}
-
-function renderTimeBars(questions) {
-  const container = document.getElementById('timeBars');
-  const maxTime = Math.max(...questions.map(q => q.timeSpent || 1), 1);
-
-  questions.forEach(q => {
-    const isCorrect = q.userAnswer === q.correctAnswer;
-    const isSkipped = q.userAnswer === null || q.userAnswer === undefined;
-    const color = isSkipped ? 'var(--accent-orange)' : isCorrect ? 'var(--accent-green)' : 'var(--accent-red)';
-    const height = Math.max(((q.timeSpent || 1) / maxTime) * 100, 4);
-
-    const item = document.createElement('div');
-    item.className = 'time-bar-item';
-    item.innerHTML = `
-      <div class="time-bar" style="height:${height}%;background:${color}" title="Q${q.id}: ${q.timeSpent || 0}s"></div>
-      <div class="time-bar-label">${q.id}</div>
-    `;
-    container.appendChild(item);
-  });
-}
-
-function renderQuestions(containerId, questions) {
-  const container = document.getElementById(containerId);
-
-  if (questions.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <p>No questions in this category</p>
-      </div>`;
+async function init() {
+  var attemptId = SS.getUrlParam('attempt_id');
+  if (!attemptId) {
+    alert('No result specified.');
+    window.location.href = '/dashboard.html';
     return;
   }
 
-  questions.forEach(q => {
-    const isCorrect = q.userAnswer === q.correctAnswer;
-    const isSkipped = q.userAnswer === null || q.userAnswer === undefined;
-    const status = isSkipped ? 'skipped' : isCorrect ? 'correct' : 'wrong';
-    const statusLabel = isSkipped ? 'Skipped' : isCorrect ? 'Correct' : 'Wrong';
-    const badgeClass = isSkipped ? 'badge-skipped' : isCorrect ? 'badge-correct' : 'badge-wrong';
-    const diffClass = q.difficulty === 'easy' ? 'diff-easy' : q.difficulty === 'hard' ? 'diff-hard' : 'diff-medium';
+  // Check auth
+  var user = await SS.requireAuth('/login.html');
+  if (!user) return;
 
-    const card = document.createElement('div');
-    card.className = `question-card ${status}`;
-    card.innerHTML = `
-      <div class="q-header" onclick="toggleQuestion(this)">
-        <div class="q-header-left">
-          <div class="q-num">Q${q.id}</div>
-          <div class="q-meta">
-            <div class="q-subject-tag">${q.subject} <span class="difficulty-tag ${diffClass}">${q.difficulty}</span></div>
-            <div class="q-text-preview">${q.question}</div>
-          </div>
-        </div>
-        <div class="q-header-right">
-          <div class="q-time">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            ${q.timeSpent || 0}s
-          </div>
-          <div class="q-status-badge ${badgeClass}">${statusLabel}</div>
-          <div class="q-expand-icon">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-          </div>
-        </div>
-      </div>
-      <div class="q-body">
-        <div class="q-body-inner">
-          ${q.passage ? `<div class="q-passage">${q.passage}</div>` : ''}
-          <div class="q-question-full">${q.question}</div>
-          <div class="q-options">
-            ${q.options.map((opt, i) => {
-              let cls = '';
-              if (i === q.correctAnswer) cls += ' is-correct';
-              if (i === q.userAnswer && !isCorrect) cls += ' user-wrong';
-              const indicator = i === q.correctAnswer ? ' ✓' : (i === q.userAnswer && !isCorrect ? ' ✗ (your answer)' : '');
-              return `<div class="q-option${cls}">
-                <div class="q-option-letter">${String.fromCharCode(65 + i)}</div>
-                <div>${opt}${indicator}</div>
-              </div>`;
-            }).join('')}
-          </div>
-          <div class="q-explanation">
-            <div class="q-explanation-header">
-              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-              Detailed Explanation
-            </div>
-            <div class="q-explanation-body">
-              <p>${q.explanation}</p>
-              ${q.steps && q.steps.length > 0 ? `
-                <div class="q-explanation-steps">
-                  <strong>Step-by-step:</strong>
-                  ${q.steps.map((step, i) => `
-                    <div class="explanation-step">
-                      <div class="step-num">${i + 1}</div>
-                      <div class="step-text">${step}</div>
-                    </div>
-                  `).join('')}
-                </div>
-              ` : ''}
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-    container.appendChild(card);
+  // Load attempt
+  state.attempt = await SS.dbLoadAttempt(attemptId);
+  if (!state.attempt || state.attempt.user_id !== user.id) {
+    alert('Result not found.');
+    window.location.href = '/dashboard.html';
+    return;
+  }
+
+  // Load test
+  state.test = await SS.dbLoadTestById(state.attempt.test_id);
+
+  // Load questions
+  var rawQuestions = await SS.dbLoadQuestions(state.attempt.test_id);
+  state.questions = rawQuestions.map(function(q) {
+    return {
+      id: q.id,
+      passage: q.passage,
+      question: q.question_text,
+      options: [q.option_a, q.option_b, q.option_c, q.option_d],
+      correctAnswer: q.correct_answer,
+      explanation: q.explanation
+    };
+  });
+
+  renderResults();
+
+  document.getElementById('loadingScreen').classList.add('hidden');
+  document.getElementById('app').style.display = 'block';
+}
+
+function renderResults() {
+  var a = state.attempt;
+  var answers = a.answers || {};
+  var pct = a.score_percent || 0;
+
+  // Score badge
+  var badge = document.getElementById('scoreBadge');
+  var ring = document.getElementById('scoreRing');
+  if (pct >= 80) {
+    badge.textContent = '🎉 Excellent!';
+    badge.className = 'score-badge excellent';
+    ring.classList.add('excellent');
+  } else if (pct >= 50) {
+    badge.textContent = '👍 Good Effort!';
+    badge.className = 'score-badge good';
+    ring.classList.add('good');
+  } else {
+    badge.textContent = '💪 Keep Practising!';
+    badge.className = 'score-badge needs-work';
+    ring.classList.add('needs-work');
+  }
+
+  // Score ring animation
+  var circumference = 264;
+  var offset = circumference - (pct / 100) * circumference;
+  setTimeout(function() {
+    ring.style.strokeDashoffset = offset;
+  }, 100);
+
+  document.getElementById('scorePercent').textContent = pct + '%';
+
+  // Test title
+  var subj = SS.SUBJ.find(function(s) { return s.id === state.test.subject; });
+  document.getElementById('testTitle').textContent = (subj ? subj.icon + ' ' : '') + (subj ? subj.title : state.test.title);
+
+  // Meta
+  var completedDate = a.completed_at ? new Date(a.completed_at).toLocaleDateString('en-AU', {
+    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+  }) : '—';
+  var status = a.status === 'timed_out' ? ' (Timed Out)' : '';
+  document.getElementById('testMeta').textContent = 'Completed on ' + completedDate + status;
+
+  // Stats
+  var correct = a.score || 0;
+  var total = state.questions.length;
+  var skipped = 0;
+  var wrong = 0;
+
+  state.questions.forEach(function(q, i) {
+    var userAns = answers[String(i)];
+    if (userAns === undefined || userAns === null) {
+      skipped++;
+    } else if (userAns !== q.correctAnswer) {
+      wrong++;
+    }
+  });
+
+  document.getElementById('statCorrect').textContent = correct;
+  document.getElementById('statWrong').textContent = wrong;
+  document.getElementById('statSkipped').textContent = skipped;
+  document.getElementById('statTime').textContent = SS.fmt(a.time_used_seconds || 0);
+
+  // Questions list
+  renderQuestions();
+
+  // Tab handlers
+  document.querySelectorAll('.tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+      this.classList.add('active');
+      state.filter = this.getAttribute('data-filter');
+      renderQuestions();
+    });
   });
 }
 
-// ============================================================
-//  INTERACTIONS
-// ============================================================
-function toggleQuestion(headerEl) {
-  const card = headerEl.closest('.question-card');
-  card.classList.toggle('expanded');
-}
+function renderQuestions() {
+  var answers = state.attempt.answers || {};
+  var letters = ['A', 'B', 'C', 'D'];
+  var html = '';
 
-function switchTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-  document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
-  document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-  document.getElementById(`tab-${tab}`).classList.add('active');
-}
+  state.questions.forEach(function(q, i) {
+    var userAns = answers[String(i)];
+    var isCorrect = userAns === q.correctAnswer;
+    var isSkipped = userAns === undefined || userAns === null;
+    var status = isSkipped ? 'skipped' : (isCorrect ? 'correct' : 'wrong');
 
-function animateNumber(elementId, target) {
-  const el = document.getElementById(elementId);
-  let current = 0;
-  const duration = 1000;
-  const step = Math.ceil(target / (duration / 30));
-  const interval = setInterval(() => {
-    current += step;
-    if (current >= target) {
-      current = target;
-      clearInterval(interval);
+    // Filter
+    if (state.filter !== 'all' && state.filter !== status) return;
+
+    var statusText = isSkipped ? 'Skipped' : (isCorrect ? 'Correct' : 'Wrong');
+
+    html += '<div class="question-card" data-index="' + i + '">';
+    html += '<div class="question-header" onclick="toggleQuestion(' + i + ')">';
+    html += '<div class="question-info">';
+    html += '<div class="q-num ' + status + '">' + (i + 1) + '</div>';
+    html += '<div class="q-preview">' + SS.esc(q.question).substring(0, 80) + (q.question.length > 80 ? '...' : '') + '</div>';
+    html += '</div>';
+    html += '<div class="q-status ' + status + '">' + statusText + '</div>';
+    html += '</div>';
+
+    html += '<div class="question-body">';
+    
+    if (q.passage) {
+      html += '<div class="q-passage">' + SS.esc(q.passage) + '</div>';
     }
-    el.textContent = current;
-  }, 30);
+
+    html += '<div class="q-text">' + SS.esc(q.question) + '</div>';
+
+    html += '<div class="q-options">';
+    q.options.forEach(function(opt, j) {
+      var classes = 'q-option';
+      if (j === q.correctAnswer) classes += ' correct-answer';
+      if (j === userAns && !isCorrect) classes += ' user-wrong';
+
+      var marker = '';
+      if (j === q.correctAnswer) marker = ' ✓ Correct';
+      if (j === userAns && !isCorrect) marker = ' ✗ Your answer';
+
+      html += '<div class="' + classes + '">';
+      html += '<div class="q-option-letter">' + letters[j] + '</div>';
+      html += '<div>' + SS.esc(opt) + marker + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+
+    if (q.explanation) {
+      html += '<div class="q-explanation">';
+      html += '<div class="q-explanation-title">💡 Explanation</div>';
+      html += '<p>' + SS.esc(q.explanation) + '</p>';
+      html += '</div>';
+    }
+
+    html += '</div>';
+    html += '</div>';
+  });
+
+  if (!html) {
+    html = '<div style="text-align:center;padding:40px;color:var(--text-muted)">No questions in this category.</div>';
+  }
+
+  document.getElementById('questionsList').innerHTML = html;
 }
 
-function formatTime(seconds) {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
-}
+window.toggleQuestion = function(index) {
+  var card = document.querySelector('.question-card[data-index="' + index + '"]');
+  if (card) card.classList.toggle('expanded');
+};
 
-function downloadPDF() {
-  alert('PDF download would be generated here.\nIn production, this uses html2pdf.js or server-side rendering.');
-}
+init();
 
-function retryWrong() {
-  alert('Retry wrong questions - redirects to test engine with only missed questions.');
-}
-
-function startNextTest() {
-  alert('Starting next test - redirects to test selection or Week 2 test.');
-}
+})();
 </script>
 
 </body>
