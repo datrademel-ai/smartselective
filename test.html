@@ -975,12 +975,7 @@ html, body {
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         Previous
       </button>
-      <div class="q-map-strip" id="qMapStrip">
-        <!-- Dots rendered by JS -->
-      </div>
-      <div class="progress-bar-wrap">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
+      <div style="flex:1"></div>
       <button class="nav-btn nav-btn-next" id="nextBtn" onclick="nextQuestion()">
         Next
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
@@ -1342,11 +1337,13 @@ function updateProgress() {
   const answered = answers.filter(a => a !== null).length;
   const total = TEST_DATA.questions.length;
   document.getElementById('answeredCount').innerHTML = `<strong>${answered}</strong>`;
-  document.getElementById('progressBar').style.width = `${(answered/total)*100}%`;
+  const pb = document.getElementById('progressBar');
+  if (pb) pb.style.width = `${(answered/total)*100}%`;
 }
 
 function buildQuestionMap() {
   const strip = document.getElementById('qMapStrip');
+  if (!strip) return;
   strip.innerHTML = '';
   TEST_DATA.questions.forEach((q, i) => {
     const dot = document.createElement('div');
