@@ -223,7 +223,9 @@ async function dbLoadAllQuestionsForWeek(weekNum, year) {
         var t = S.weekTests[i];
         if (t.is_published) {
             var qs = await dbLoadQuestions(t.id);
-            S.weekQuestions[t.subject] = { testId: t.id, questions: qs, time: t.time_limit_minutes };
+            var testNum = t.test_number || 1;
+            var key = t.subject + '_' + testNum;
+            S.weekQuestions[key] = { testId: t.id, questions: qs, time: t.time_limit_minutes };
         }
     }
 }
@@ -354,22 +356,27 @@ async function rDash(el) {
 function rCards(w) {
     var h = '';
     SUBJ.forEach(function(sj) {
-        var wq = S.weekQuestions[sj.id];
-        var has = wq && wq.questions && wq.questions.length > 0;
-        var testId = wq ? wq.testId : null;
-        var attempt = S.attempts.find(function(a) { return a.test_id === testId; });
-        var done = attempt && (attempt.status === 'completed' || attempt.status === 'timed_out');
-        var inProg = attempt && (attempt.status === 'in_progress' || attempt.status === 'paused');
-        var st, btn;
+        // Show Test 1 and Test 2 for each subject
+        for (var tn = 1; tn <= 2; tn++) {
+            var testKey = sj.id + '_' + tn;
+            var wq = S.weekQuestions[testKey];
+            var has = wq && wq.questions && wq.questions.length > 0;
+            var testId = wq ? wq.testId : null;
+            var attempt = S.attempts.find(function(a) { return a.test_id === testId; });
+            var done = attempt && (attempt.status === 'completed' || attempt.status === 'timed_out');
+            var inProg = attempt && (attempt.status === 'in_progress' || attempt.status === 'paused');
+            var st, btn;
 
-        if (!w.open) { st = '<span class="bd bd-l">🔒 Closed</span>'; btn = '<button class="tb tb-l" disabled>Opens Tuesday</button>'; }
-        else if (!has) { st = '<span class="bd bd-l">⏳ Pending</span>'; btn = '<button class="tb tb-l" disabled>Not Available</button>'; }
-        else if (done) { st = '<span class="bd bd-d">✓ Done</span>'; btn = '<button class="tb tb-v" onclick="SS.vRes(\'' + attempt.id + '\')">View Result</button>'; }
-        else if (inProg) { st = '<span class="bd bd-u">⏸ Paused</span>'; btn = '<button class="tb tb-r" onclick="SS.resume(\'' + sj.id + '\')">Resume</button>'; }
-        else { st = '<span class="bd bd-n">New</span>'; btn = '<button class="tb tb-s" onclick="SS.start(\'' + sj.id + '\')">Start Test</button>'; }
+            if (!w.open) { st = '<span class="bd bd-l">🔒 Closed</span>'; btn = '<button class="tb tb-l" disabled>Opens Tuesday</button>'; }
+            else if (!has) { st = '<span class="bd bd-l">⏳ Pending</span>'; btn = '<button class="tb tb-l" disabled>Not Available</button>'; }
+            else if (done) { st = '<span class="bd bd-d">✓ Done</span>'; btn = '<button class="tb tb-v" onclick="SS.vRes(\'' + attempt.id + '\')">View Result</button>'; }
+            else if (inProg) { st = '<span class="bd bd-u">⏸ Paused</span>'; btn = '<button class="tb tb-r" onclick="SS.resume(\'' + testKey + '\')">Resume</button>'; }
+            else { st = '<span class="bd bd-n">New</span>'; btn = '<button class="tb tb-s" onclick="SS.start(\'' + testKey + '\')">Start Test</button>'; }
 
-        var qc = has ? wq.questions.length + ' items' : '—';
-        h += '<div class="tc"><div class="ts" style="' + sj.stripe + '"></div><div class="th"><div class="tt">' + sj.title + '</div><div class="ti">' + sj.icon + '</div></div><div class="tm"><div class="tr"><span>Questions</span><b>' + qc + '</b></div><div class="tr"><span>Time</span><b>' + (has ? wq.time : sj.time) + ' min</b></div><div class="tr"><span>Status</span>' + st + '</div></div>' + btn + '</div>';
+            var qc = has ? wq.questions.length + ' items' : '—';
+            var testLabel = sj.title + ' - Test ' + tn;
+            h += '<div class="tc"><div class="ts" style="' + sj.stripe + '"></div><div class="th"><div class="tt">' + testLabel + '</div><div class="ti">' + sj.icon + '</div></div><div class="tm"><div class="tr"><span>Questions</span><b>' + qc + '</b></div><div class="tr"><span>Time</span><b>' + (has ? wq.time : sj.time) + ' min</b></div><div class="tr"><span>Status</span>' + st + '</div></div>' + btn + '</div>';
+        }
     });
     return h;
 }
