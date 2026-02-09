@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary Builder - SmartSelective</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        nav {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        /* Mobile Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #333;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: #333;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: #2563eb;
+        }
+        
+        .btn {
+            background: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+        }
+        
+        .section {
+            padding: 4rem 0;
+        }
+        
+        /* Mode Selection */
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .mode-card {
+            background: #f9fafb;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+        
+        .mode-card:hover {
+            border-color: #2563eb;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+        }
+        
+        .mode-card .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .mode-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+        
+        .mode-card p {
+            color: #6b7280;
+        }
+        
+        /* Progress Section */
+        .progress-section {
+            background: #f0f9ff;
+            border: 2px solid #0ea5e9;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .progress-item {
+            text-align: center;
+        }
+        
+        .progress-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #0369a1;
+        }
+        
+        .progress-label {
+            color: #475569;
+            margin-top: 0.5rem;
+        }
+        
+        /* Flashcard */
+        .flashcard-container {
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+        
+        .flashcard {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 3rem 2rem;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+        
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front, .card-back {
+            backface-visibility: hidden;
+            position: absolute;
+            width: 100%;
+            padding: 3rem 2rem;
+        }
+        
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        
+        .word-term {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+        
+        .word-type {
+            font-size: 1rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+        
+        .word-level {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .word-definition {
+            font-size: 1.25rem;
+            color: #374151;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tap-hint {
+            color: #9ca3af;
+            font-size: 0.875rem;
+            margin-top: 2rem;
+        }
+        
+        .card-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .control-btn {
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: none;
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .know-btn {
+            background: #10b981;
+            color: white;
+        }
+        
+        .know-btn:hover {
+            background: #059669;
+        }
+        
+        .review-btn {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .review-btn:hover {
+            background: #d97706;
+        }
+        
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+        }
+        
+        .nav-btn {
+            background: #e5e7eb;
+            color: #374151;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn:hover:not(:disabled) {
+            background: #d1d5db;
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+        
+        .streak-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #fef3c7;
+            color: #92400e;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        /* Quiz */
+        .quiz-container {
+            max-width: 700px;
+            margin: 2rem auto;
+        }
+        
+        .quiz-question {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 2rem;
+        }
+        
+        .answer-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .answer-option {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            padding: 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .answer-option:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        
+        .answer-option.selected {
+            border-color: #2563eb;
+            background: #dbeafe;
+        }
+        
+        .answer-option.correct {
+            border-color: #10b981;
+            background: #d1fae5;
+        }
+        
+        .answer-option.incorrect {
+            border-color: #ef4444;
+            background: #fee2e2;
+        }
+        
+        .option-letter {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: #6b7280;
+            min-width: 30px;
+        }
+        
+        .option-text {
+            font-size: 1.125rem;
+            color: #374151;
+        }
+        
+        .quiz-result {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 3rem;
+            text-align: center;
+        }
+        
+        .result-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .result-score {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 1rem;
+        }
+        
+        .result-message {
+            font-size: 1.25rem;
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+        
+        /* Filter Section */
+        .filter-section {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        
+        .filter-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+        }
+        
+        /* Hidden */
+        .hidden {
+            display: none;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 1rem 0;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
+            
+            nav ul.mobile-active {
+                display: flex;
+            }
+            
+            nav ul li {
+                width: 100%;
+                text-align: center;
+            }
+            
+            nav ul li a {
+                display: block;
+                padding: 1rem;
+            }
+            
+            .hamburger {
+                display: flex;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .mode-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .mode-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .flashcard {
+                min-height: 350px;
+                padding: 2rem 1.5rem;
+            }
+            
+            .word-term {
+                font-size: 2rem;
+            }
+            
+            .word-definition {
+                font-size: 1.125rem;
+            }
+            
+            .control-btn {
+                padding: 0.875rem 1.5rem;
+                font-size: 1rem;
+            }
+            
+            .question-text {
+                font-size: 1.25rem;
+            }
+            
+            .option-text {
+                font-size: 1rem;
+            }
+        }
+        
+        footer {
+            background: #1f2937;
+            color: white;
+            padding: 3rem 0;
+        }
+        
+        footer .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+        
+        footer h4 {
+            margin-bottom: 1rem;
+        }
+        
+        footer a {
+            color: #d1d5db;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        footer a:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">SmartSelective</a>
+            
+            <div class="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <ul id="nav-menu">
+                <li><a href="/how-it-works.html">How It Works</a></li>
+                <li><a href="/subjects.html">Subject Guide</a></li>
+                <li><a href="/vocabulary.html">Vocabulary</a></li>
+                <li><a href="/pricing.html">Pricing</a></li>
+                <li><a href="/about.html">About</a></li>
+                <li><a href="/contact.html">Contact</a></li>
+                <li><a href="/signup.html" class="btn">Start Now</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1>🎓 Vocabulary Builder</h1>
+            <p>Master 960+ essential words for VIC Selective Schools exam</p>
+            <div style="background: rgba(255,255,255,0.2); display: inline-block; padding: 0.75rem 1.5rem; border-radius: 20px; margin-top: 1rem;">
+                <strong>✨ 100% FREE</strong> - No signup required!
+            </div>
+        </div>
+    </section>
+
+    <!-- Mode Selection -->
+    <section id="mode-selection" class="section">
+        <div class="container">
+            <div class="progress-section">
+                <h2 style="text-align: center; color: #0369a1; margin-bottom: 1.5rem;">📊 Your Progress</h2>
+                <div class="progress-grid">
+                    <div class="progress-item">
+                        <div class="progress-number" id="total-studied">0</div>
+                        <div class="progress-label">Words Studied</div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-number" id="mastered-count">0</div>
+                        <div class="progress-label">Mastered</div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-number" id="streak-count">0</div>
+                        <div class="progress-label">Day Streak 🔥</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 style="text-align: center; margin: 3rem 0 1rem;">Choose Your Learning Mode</h2>
+            
+            <div class="mode-grid">
+                <div class="mode-card" onclick="startFlashcards()">
+                    <div class="icon">🎴</div>
+                    <h3>Flashcards</h3>
+                    <p>Learn words at your own pace with interactive cards</p>
+                </div>
+                
+                <div class="mode-card" onclick="startQuiz()">
+                    <div class="icon">🎯</div>
+                    <h3>Quick Quiz</h3>
+                    <p>Test yourself with 10 random questions</p>
+                </div>
+                
+                <div class="mode-card" onclick="alert('Coming soon! 📚')">
+                    <div class="icon">📖</div>
+                    <h3>Word List</h3>
+                    <p>Browse and search all 960+ words</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Flashcard Mode -->
+    <section id="flashcard-mode" class="section hidden">
+        <div class="container">
+            <div class="flashcard-container">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <span class="streak-badge" id="current-streak">
+                        🔥 Streak: <span id="card-streak">0</span>
+                    </span>
+                </div>
+                
+                <div style="text-align: center; color: #6b7280; margin-bottom: 1rem;">
+                    <span id="card-counter">1 / 960</span>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="card-progress" style="width: 0%"></div>
+                </div>
+                
+                <div class="flashcard" id="flashcard" onclick="flipCard()">
+                    <div class="card-front">
+                        <div class="word-term" id="word-term">absolutely perfect</div>
+                        <div class="word-type" id="word-type">adv + adj</div>
+                        <div class="word-level" id="word-level">Level: RS</div>
+                        <div class="tap-hint">👆 Tap to reveal definition</div>
+                    </div>
+                    
+                    <div class="card-back">
+                        <div class="word-definition" id="word-definition">
+                            of the best quality and without any faults at all
+                        </div>
+                        <div style="color: #6b7280; font-style: italic; margin-top: 1rem;" id="word-example"></div>
+                    </div>
+                </div>
+                
+                <div class="card-controls">
+                    <button class="control-btn review-btn" onclick="markForReview()">
+                        🤔 Need Review
+                    </button>
+                    <button class="control-btn know-btn" onclick="markAsKnown()">
+                        😊 Got It!
+                    </button>
+                </div>
+                
+                <div class="nav-controls">
+                    <button class="nav-btn" id="prev-btn" onclick="previousCard()" disabled>
+                        ← Previous
+                    </button>
+                    <button class="btn btn-secondary" onclick="exitMode()">
+                        Exit
+                    </button>
+                    <button class="nav-btn" id="next-btn" onclick="nextCard()">
+                        Next →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quiz Mode -->
+    <section id="quiz-mode" class="section hidden">
+        <div class="container">
+            <div class="quiz-container">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <h2>Quick Quiz Challenge</h2>
+                    <p style="color: #6b7280; margin-top: 0.5rem;">
+                        Question <span id="quiz-counter">1</span> / 10
+                    </p>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="quiz-progress" style="width: 0%"></div>
+                </div>
+                
+                <div id="quiz-question-container">
+                    <!-- Quiz questions will be inserted here -->
+                </div>
+                
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button class="btn btn-secondary" onclick="exitMode()">
+                        Exit Quiz
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quiz Result -->
+    <section id="quiz-result" class="section hidden">
+        <div class="container">
+            <div style="max-width: 600px; margin: 0 auto;">
+                <div class="quiz-result">
+                    <div class="result-icon" id="result-icon">🎉</div>
+                    <h2>Quiz Complete!</h2>
+                    <div class="result-score" id="result-score">8/10</div>
+                    <div class="result-message" id="result-message">Great job!</div>
+                    
+                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                        <button class="btn" onclick="startQuiz()">Try Again</button>
+                        <button class="btn btn-secondary" onclick="exitMode()">Back to Menu</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div>
+                <h4>Product</h4>
+                <a href="/how-it-works.html">How It Works</a>
+                <a href="/subjects.html">Subject Guide</a>
+                <a href="/vocabulary.html">Vocabulary</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/faq.html">FAQ</a>
+            </div>
+            <div>
+                <h4>Company</h4>
+                <a href="/about.html">About Us</a>
+                <a href="/contact.html">Contact</a>
+            </div>
+            <div>
+                <h4>Legal</h4>
+                <a href="/terms.html">Terms of Service</a>
+                <a href="/privacy.html">Privacy Policy</a>
+            </div>
+        </div>
+        <div class="container" style="margin-top: 2rem; text-align: center; border-top: 1px solid #374151; padding-top: 2rem;">
+            <p>© 2026 SmartSelective. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="vocabulary-data.js"></script>
+    <script src="vocabulary.js"></script>
+</body>
+</html>
