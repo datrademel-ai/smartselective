@@ -271,6 +271,17 @@ async function dbCreateTest(weekNum, year, subject, title, timeMin) {
     return data;
 }
 
+async function dbCreateTestWithNumber(weekNum, year, subject, title, timeMin, testNumber) {
+    var { data, error } = await SB.from('weekly_tests').insert({
+        week_number: weekNum, year: year, subject: subject,
+        title: title, time_limit_minutes: timeMin,
+        test_number: testNumber || 1,
+        is_published: false, created_by: S.user.id
+    }).select().single();
+    if (error) { toast('Error: ' + error.message, 'w'); return null; }
+    return data;
+}
+
 async function dbAddQuestion(testId, order, passage, question, optA, optB, optC, optD, correct, explanation) {
     var { data, error } = await SB.from('questions').insert({
         test_id: testId, question_order: order, passage: passage || null,
@@ -290,11 +301,16 @@ async function dbPublishTest(testId) {
     await SB.from('weekly_tests').update({ is_published: true, published_at: new Date().toISOString() }).eq('id', testId);
 }
 
-async function dbGetOrCreateTest(weekNum, year, subject) {
-    var existing = S.weekTests.find(function(t) { return t.subject === subject && t.week_number === weekNum && t.year === year; });
+async function dbGetOrCreateTest(weekNum, year, subject, testNumber) {
+    // testNumber: 1 or 2 (default 1 for backward compatibility)
+    testNumber = testNumber || 1;
+    var existing = S.weekTests.find(function(t) { 
+        return t.subject === subject && t.week_number === weekNum && t.year === year && t.test_number === testNumber; 
+    });
     if (existing) return existing;
     var sj = SUBJ.find(function(s) { return s.id === subject; });
-    return await dbCreateTest(weekNum, year, subject, sj.title, sj.time);
+    var title = sj.title + ' - Test ' + testNumber;
+    return await dbCreateTestWithNumber(weekNum, year, subject, title, sj.time, testNumber);
 }
 
 // ============================================================
@@ -507,11 +523,13 @@ async function rAdmin(el) {
         h += '</div>';
         for (var si = 0; si < SUBJ.length; si++) {
             var sj = SUBJ[si];
-            var t = testsData.find(function(t) { return t.subject === sj.id && t.week_number === detailWk; });
-            h += '<div style="margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--bdr-l)">';
-            h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem"><div style="display:flex;align-items:center;gap:.5rem"><span>' + sj.icon + '</span><b style="font-size:.875rem">' + sj.title + '</b>';
-            if (t) {
-                var qc = t.questions && t.questions[0] ? t.questions[0].count : 0;
+            // Show Test 1 and Test 2 for each subject
+            for (var tn = 1; tn <= 2; tn++) {
+                var t = testsData.find(function(t) { return t.subject === sj.id && t.week_number === detailWk && t.test_number === tn; });
+                h += '<div style="margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--bdr-l)">';
+                h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem"><div style="display:flex;align-items:center;gap:.5rem"><span>' + sj.icon + '</span><b style="font-size:.875rem">' + sj.title + ' - Test ' + tn + '</b>';
+                if (t) {
+                    var qc = t.questions && t.questions[0] ? t.questions[0].count : 0;
                 h += ' <span class="bd ' + (qc > 0 ? 'bd-d' : 'bd-n') + '">' + qc + 'Q</span>';
                 h += t.is_published ? ' <span class="bd bd-d">Published</span>' : ' <span class="bd bd-p">Draft</span>';
             } else {
@@ -523,9 +541,10 @@ async function rAdmin(el) {
             }
             if (t) {
                 h += '<button class="aqb" style="background:var(--blue-p);color:var(--blue)" onclick="SS.viewQs(\'' + t.id + '\',\'' + sj.id + '\')">View Q\'s</button>';
-                h += '<button class="aqb" style="background:var(--red-p);color:var(--red)" onclick="SS.delTest(\'' + t.id + '\',\'' + sj.title + '\',' + t.is_published + ')">Delete</button>';
+                h += '<button class="aqb" style="background:var(--red-p);color:var(--red)" onclick="SS.delTest(\'' + t.id + '\',\'' + sj.title + ' - Test ' + tn + '\',' + t.is_published + ')">Delete</button>';
             }
             h += '</div></div></div>';
+            }
         }
         h += '<div id="qsDetail"></div>';
         h += '</div>';
@@ -538,6 +557,7 @@ async function rAdmin(el) {
         h += '<div class="afr"><div class="afl">Subject</div><div><select class="afs" id="as">';
         SUBJ.forEach(function(s) { h += '<option value="' + s.id + '">' + s.icon + ' ' + s.title + '</option>'; });
         h += '</select></div></div>';
+        h += '<div class="afr"><div class="afl">Test Number</div><div><select class="afs" id="atn"><option value="1">Test 1</option><option value="2">Test 2</option></select></div></div>';
         h += '<div class="afr"><div class="afl">Method</div><div><select class="afs" id="am"><option value="json" selected>JSON Import</option><option value="manual">Manual</option></select></div></div>';
         // Manual
         h += '<div id="me" style="display:none"><div class="afr"><div class="afl">Passage</div><div><textarea class="aft" id="ap" placeholder="Reading passage (optional)..."></textarea></div></div>';
@@ -617,6 +637,7 @@ SS.atab = function(t) { S.adView = t; rv(); };
 SS.addQ = async function() {
     var weekNum = parseInt(document.getElementById('aw').value);
     var subject = document.getElementById('as').value;
+    var testNumber = parseInt(document.getElementById('atn').value);
     var p = document.getElementById('ap').value.trim();
     var q = document.getElementById('aq').value.trim();
     var a = document.getElementById('oA').value.trim(), b = document.getElementById('oB').value.trim();
@@ -628,7 +649,7 @@ SS.addQ = async function() {
     var w = getWeek();
     // Ensure test exists
     await dbLoadWeekTests(weekNum, w.yr);
-    var test = await dbGetOrCreateTest(weekNum, w.yr, subject);
+    var test = await dbGetOrCreateTest(weekNum, w.yr, subject, testNumber);
     if (!test) return;
 
     // Count existing questions to set order
@@ -650,6 +671,7 @@ SS.addQ = async function() {
 SS.addJ = async function() {
     var weekNum = parseInt(document.getElementById('aw').value);
     var subject = document.getElementById('as').value;
+    var testNumber = parseInt(document.getElementById('atn').value);
     var js = document.getElementById('aj').value.trim();
     var btn = document.getElementById('jImpBtn');
     var prog = document.getElementById('jProg');
@@ -671,7 +693,7 @@ SS.addJ = async function() {
 
         var w = getWeek();
         await dbLoadWeekTests(weekNum, w.yr);
-        var test = await dbGetOrCreateTest(weekNum, w.yr, subject);
+        var test = await dbGetOrCreateTest(weekNum, w.yr, subject, testNumber);
         if (!test) { btn.disabled = false; btn.textContent = '⬆ Import to DB'; prog.style.display = 'none'; return; }
         var existing = await dbLoadQuestions(test.id);
         var order = existing.length;
