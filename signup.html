@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - SmartSelective</title>
+    <title>Sign Up - SmartSelective Beta</title>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -17,6 +17,47 @@
         .signup-header { text-align: center; margin-bottom: 2rem; }
         .signup-header h1 { font-size: 2rem; color: #2563eb; margin-bottom: 0.5rem; }
         .signup-header p { color: #6b7280; }
+
+        .beta-banner { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 1.2rem; 
+            border-radius: 10px; 
+            margin-bottom: 1.5rem; 
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .beta-banner .main-title { 
+            font-size: 1.3rem; 
+            font-weight: bold; 
+            margin-bottom: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .beta-banner .price-line { 
+            font-size: 1.1rem; 
+            margin-bottom: 0.4rem;
+        }
+        .beta-banner .price-highlight { 
+            font-size: 1.5rem; 
+            font-weight: bold; 
+            color: #fde047;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .beta-banner .regular-price { 
+            font-size: 0.9rem; 
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+        .beta-banner .urgency { 
+            font-size: 0.85rem; 
+            margin-top: 0.6rem; 
+            font-weight: 600;
+            padding: 0.4rem 0.8rem;
+            background: rgba(253, 224, 71, 0.2);
+            border-radius: 6px;
+            display: inline-block;
+        }
 
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
         .form-group { margin-bottom: 1.25rem; }
@@ -57,8 +98,16 @@
         <div class="container">
             <div class="signup-container">
                 <div class="signup-header">
-                    <h1>Create Your Account</h1>
-                    <p>Start preparing for VIC Selective Schools exam</p>
+                    <div class="beta-banner">
+                        <div class="main-title">🎉 Beta Special Offer 🎉</div>
+                        <div class="price-line">
+                            FREE until Feb 28 • Then <span class="price-highlight">$79/month</span>
+                        </div>
+                        <div class="regular-price">Regular price $99/month • Save $240/year FOREVER!</div>
+                        <div class="urgency">⏰ Limited to first 100 members • Offer ends Feb 28</div>
+                    </div>
+                    <h1>Join as Founding Member</h1>
+                    <p>Lock in lifetime discount + exclusive benefits</p>
                 </div>
 
                 <div id="errorMessage" class="error-message"></div>
@@ -139,7 +188,7 @@
                         <div class="cf-turnstile" data-sitekey="0x4AAAAAACXpwGor-eJ0CZih" data-callback="onTurnstileSuccess"></div>
                     </div>
 
-                    <button type="submit" class="submit-btn" id="submitBtn">Create Account</button>
+                    <button type="submit" class="submit-btn" id="submitBtn">Join Beta & Lock in $79/month</button>
                 </form>
 
                 <div class="login-link">
@@ -237,7 +286,7 @@
                 // 2. 세션 ID 생성 (단일 기기 로그인용)
                 var sessionId = crypto.randomUUID();
 
-                // 3. profiles 테이블에 저장
+                // 3. profiles 테이블에 저장 (베타 멤버로 표시!)
                 var displayName = firstName + ' ' + lastName;
                 var profileResult = await sb.from('profiles').upsert({
                     id: user.id,
@@ -246,7 +295,10 @@
                     phone: phone,
                     role: 'student',
                     is_active: true,
-                    subscription_status: 'none',
+                    subscription_status: 'beta_79', // ← 베타 멤버!
+                    subscription_tier: 'beta_79',
+                    lifetime_price: 79,
+                    beta_joined_date: new Date().toISOString(),
                     active_session_id: sessionId,
                     last_active: new Date().toISOString(),
                     privacy_agreed: privacyOk,
@@ -267,7 +319,7 @@
                     window.location.href = '/dashboard.html';
                 } else {
                     // 이메일 확인 필요
-                    successDiv.innerHTML = '✅ Account created successfully!<br><br>Please check your email (<b>' + email + '</b>) to verify your account, then <a href="/login.html" style="color:#16a34a;font-weight:600;">log in here</a>.';
+                    successDiv.innerHTML = '🎉 <b>Congrats! You\'re now a Founding Member!</b><br><br>Please check your email (<b>' + email + '</b>) to verify your account, then <a href="/login.html" style="color:#16a34a;font-weight:600;">log in here</a>.<br><br>✅ FREE until Feb 28<br>✅ Then $79/month forever (Regular: $99/month)';
                     successDiv.style.display = 'block';
                     form.style.display = 'none';
                 }
@@ -279,7 +331,7 @@
                 }
                 showError(errMsg);
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Create Account';
+                submitBtn.textContent = 'Join Beta & Lock in $79/month';
                 // Reset Turnstile
                 if (window.turnstile) { turnstile.reset(); turnstileToken = null; }
             }
