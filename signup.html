@@ -234,7 +234,7 @@
                         <div class="cf-turnstile" data-sitekey="0x4AAAAAACXpwGor-eJ0CZih" data-callback="onTurnstileSuccess"></div>
                     </div>
 
-                    <button type="submit" class="submit-btn" id="submitBtn">Join Beta & Lock in $79/month</button>
+                    <button type="submit" class="submit-btn" id="submitBtn">Sign Up</button>
                 </form>
 
                 <div class="login-link">
@@ -341,10 +341,9 @@
                     phone: phone,
                     role: 'student',
                     is_active: true,
-                    subscription_status: 'beta_79', // ← 베타 멤버!
+                    subscription_status: 'beta_79',
                     subscription_tier: 'beta_79',
                     lifetime_price: 79,
-                    beta_joined_date: new Date().toISOString(),
                     active_session_id: sessionId,
                     last_active: new Date().toISOString(),
                     privacy_agreed: privacyOk,
@@ -377,7 +376,7 @@
                 }
                 showError(errMsg);
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Join Beta & Lock in $79/month';
+                submitBtn.textContent = 'Sign Up';
                 // Reset Turnstile
                 if (window.turnstile) { turnstile.reset(); turnstileToken = null; }
             }
