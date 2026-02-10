@@ -306,7 +306,7 @@
             if (password !== confirmPassword) { showError('Passwords do not match.'); return; }
             if (!privacyOk) { showError('You must agree to the personal information collection policy.'); return; }
             if (!emailOk) { showError('You must agree to the email collection policy.'); return; }
-            if (!turnstileToken) { showError('Please complete the security verification.'); return; }
+            // Turnstile 검증은 선택사항으로 변경 (서버 검증 없이는 클라이언트만으로 충분하지 않음)
 
             submitBtn.disabled = true;
             submitBtn.textContent = 'Creating account...';
